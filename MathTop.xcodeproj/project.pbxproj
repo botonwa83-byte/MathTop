@@ -1,0 +1,366 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		409014750388C7574691CFBD /* DailyPlanService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB7CE7E22BA9655BECE6B06 /* DailyPlanService.swift */; };
+		6514F4F064BC1E3115778C67 /* MathTopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F972E556F9AEA46C40EE16 /* MathTopApp.swift */; };
+		68B60621A8286C7E59C2A693 /* LearningStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5229E95F844A2FB71A63EF4C /* LearningStore.swift */; };
+		8848FF91EBF8FB1E7FDDD414 /* MathContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26E4163A3F0A9825D7187AF /* MathContent.swift */; };
+		97F31710BE4AEF981C39FDEE /* LearningModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8A6C0CE97AE10F4C288E79 /* LearningModels.swift */; };
+		A835717F174FF3A300EA3C2E /* CurriculumAudit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9983346BD2741DAE47E330 /* CurriculumAudit.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		495FB9B6E3CE803FD846DB3D /* MathTop.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MathTop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5229E95F844A2FB71A63EF4C /* LearningStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningStore.swift; sourceTree = "<group>"; };
+		7C9983346BD2741DAE47E330 /* CurriculumAudit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumAudit.swift; sourceTree = "<group>"; };
+		7CB7CE7E22BA9655BECE6B06 /* DailyPlanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPlanService.swift; sourceTree = "<group>"; };
+		B8F972E556F9AEA46C40EE16 /* MathTopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathTopApp.swift; sourceTree = "<group>"; };
+		BE8A6C0CE97AE10F4C288E79 /* LearningModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningModels.swift; sourceTree = "<group>"; };
+		F26E4163A3F0A9825D7187AF /* MathContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathContent.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0D9FB135201024A6E77ADBAD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				BE8A6C0CE97AE10F4C288E79 /* LearningModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		2781524986112190A08CBFE5 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		2E34EB8144B8519E680852EA /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				7CB7CE7E22BA9655BECE6B06 /* DailyPlanService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		39E99F69C0DAF16970C53169 /* Content */ = {
+			isa = PBXGroup;
+			children = (
+				7C9983346BD2741DAE47E330 /* CurriculumAudit.swift */,
+				F26E4163A3F0A9825D7187AF /* MathContent.swift */,
+			);
+			path = Content;
+			sourceTree = "<group>";
+		};
+		59C4734EDDEC8C50E74D733B = {
+			isa = PBXGroup;
+			children = (
+				C3905E85028890835444B355 /* MathTop */,
+				A638F195E8E4BA0B2056CBBA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		90977EC8B6EEA2226B208DC1 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				B8F972E556F9AEA46C40EE16 /* MathTopApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A638F195E8E4BA0B2056CBBA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				495FB9B6E3CE803FD846DB3D /* MathTop.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BB4D07C99C4FBCCCAC5219A3 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				5229E95F844A2FB71A63EF4C /* LearningStore.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		C3905E85028890835444B355 /* MathTop */ = {
+			isa = PBXGroup;
+			children = (
+				90977EC8B6EEA2226B208DC1 /* App */,
+				39E99F69C0DAF16970C53169 /* Content */,
+				2781524986112190A08CBFE5 /* Features */,
+				0D9FB135201024A6E77ADBAD /* Models */,
+				2E34EB8144B8519E680852EA /* Services */,
+				BB4D07C99C4FBCCCAC5219A3 /* Store */,
+			);
+			path = MathTop;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F7A04B970A94B0545BD395B4 /* MathTop */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA239213AC2A40D332B660A6 /* Build configuration list for PBXNativeTarget "MathTop" */;
+			buildPhases = (
+				CC334CAE8DE7CE08370C2854 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MathTop;
+			packageProductDependencies = (
+			);
+			productName = MathTop;
+			productReference = 495FB9B6E3CE803FD846DB3D /* MathTop.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B21AE0E9E05CCA34639C06EC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = F9F13E48BE0609CB07371659 /* Build configuration list for PBXProject "MathTop" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 59C4734EDDEC8C50E74D733B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A638F195E8E4BA0B2056CBBA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F7A04B970A94B0545BD395B4 /* MathTop */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CC334CAE8DE7CE08370C2854 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A835717F174FF3A300EA3C2E /* CurriculumAudit.swift in Sources */,
+				409014750388C7574691CFBD /* DailyPlanService.swift in Sources */,
+				97F31710BE4AEF981C39FDEE /* LearningModels.swift in Sources */,
+				68B60621A8286C7E59C2A693 /* LearningStore.swift in Sources */,
+				8848FF91EBF8FB1E7FDDD414 /* MathContent.swift in Sources */,
+				6514F4F064BC1E3115778C67 /* MathTopApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1C66A2A426654FC7ABD60BA4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_LANGUAGE = "zh-Hans";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		CA11717BB1CC9767E074F3BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_LANGUAGE = "zh-Hans";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		D68DD139BF07B769657E5A2E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MathTop;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.mathtop.app;
+				PRODUCT_NAME = MathTop;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D7D14A67BDD6099606398B05 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MathTop;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.mathtop.app;
+				PRODUCT_NAME = MathTop;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		EA239213AC2A40D332B660A6 /* Build configuration list for PBXNativeTarget "MathTop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D7D14A67BDD6099606398B05 /* Debug */,
+				D68DD139BF07B769657E5A2E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F9F13E48BE0609CB07371659 /* Build configuration list for PBXProject "MathTop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C66A2A426654FC7ABD60BA4 /* Debug */,
+				CA11717BB1CC9767E074F3BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B21AE0E9E05CCA34639C06EC /* Project object */;
+}
