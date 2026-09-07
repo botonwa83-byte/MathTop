@@ -14,6 +14,7 @@
 		97F31710BE4AEF981C39FDEE /* LearningModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8A6C0CE97AE10F4C288E79 /* LearningModels.swift */; };
 		A835717F174FF3A300EA3C2E /* CurriculumAudit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9983346BD2741DAE47E330 /* CurriculumAudit.swift */; };
 		AABBE463BDED34601A2506AB /* ReviewScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523F2523CB209C8B6E09B844 /* ReviewScheduler.swift */; };
+		C061A40A87590A425FA42330 /* GrowthSummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4BC5A7244AFE146BC93F70 /* GrowthSummaryService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		7CB7CE7E22BA9655BECE6B06 /* DailyPlanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPlanService.swift; sourceTree = "<group>"; };
 		B8F972E556F9AEA46C40EE16 /* MathTopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathTopApp.swift; sourceTree = "<group>"; };
 		BE8A6C0CE97AE10F4C288E79 /* LearningModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningModels.swift; sourceTree = "<group>"; };
+		DB4BC5A7244AFE146BC93F70 /* GrowthSummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthSummaryService.swift; sourceTree = "<group>"; };
 		F26E4163A3F0A9825D7187AF /* MathContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathContent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -47,6 +49,7 @@
 			isa = PBXGroup;
 			children = (
 				7CB7CE7E22BA9655BECE6B06 /* DailyPlanService.swift */,
+				DB4BC5A7244AFE146BC93F70 /* GrowthSummaryService.swift */,
 				523F2523CB209C8B6E09B844 /* ReviewScheduler.swift */,
 			);
 			path = Services;
@@ -163,6 +166,7 @@
 			files = (
 				A835717F174FF3A300EA3C2E /* CurriculumAudit.swift in Sources */,
 				409014750388C7574691CFBD /* DailyPlanService.swift in Sources */,
+				C061A40A87590A425FA42330 /* GrowthSummaryService.swift in Sources */,
 				97F31710BE4AEF981C39FDEE /* LearningModels.swift in Sources */,
 				68B60621A8286C7E59C2A693 /* LearningStore.swift in Sources */,
 				8848FF91EBF8FB1E7FDDD414 /* MathContent.swift in Sources */,
