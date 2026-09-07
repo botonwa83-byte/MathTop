@@ -50,6 +50,9 @@ struct HomeView: View {
                         SkillCard(icon: "character.book.closed", title: "句子魔法", subtitle: "一般现在时", color: sky, progress: 0.45)
                     }
                     Text("继续你的探索").font(.title3.bold()).foregroundStyle(ink)
+                    if store.dueReviewCount > 0 {
+                        NavigationLink { ErrorBookView() } label: { HStack { Image(systemName: "clock.badge.exclamationmark").foregroundStyle(coral); Text("有 \(store.dueReviewCount) 个知识点该复习了").font(.headline).foregroundStyle(ink); Spacer(); Image(systemName: "chevron.right").foregroundStyle(.secondary) }.padding(14).background(coral.opacity(0.12)).clipShape(RoundedRectangle(cornerRadius: 16)) }
+                    }
                     ContinueRow(icon: "arrow.triangle.2.circlepath", title: "错题变身器", detail: "把错题变成下一次的得分点", color: mint)
                     ContinueRow(icon: "headphones", title: "耳朵先知道", detail: "3 分钟英语听力热身", color: sky)
                 }.padding(20)

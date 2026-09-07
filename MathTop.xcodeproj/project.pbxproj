@@ -13,11 +13,13 @@
 		8848FF91EBF8FB1E7FDDD414 /* MathContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26E4163A3F0A9825D7187AF /* MathContent.swift */; };
 		97F31710BE4AEF981C39FDEE /* LearningModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8A6C0CE97AE10F4C288E79 /* LearningModels.swift */; };
 		A835717F174FF3A300EA3C2E /* CurriculumAudit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9983346BD2741DAE47E330 /* CurriculumAudit.swift */; };
+		AABBE463BDED34601A2506AB /* ReviewScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523F2523CB209C8B6E09B844 /* ReviewScheduler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		495FB9B6E3CE803FD846DB3D /* MathTop.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MathTop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5229E95F844A2FB71A63EF4C /* LearningStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningStore.swift; sourceTree = "<group>"; };
+		523F2523CB209C8B6E09B844 /* ReviewScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewScheduler.swift; sourceTree = "<group>"; };
 		7C9983346BD2741DAE47E330 /* CurriculumAudit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumAudit.swift; sourceTree = "<group>"; };
 		7CB7CE7E22BA9655BECE6B06 /* DailyPlanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPlanService.swift; sourceTree = "<group>"; };
 		B8F972E556F9AEA46C40EE16 /* MathTopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathTopApp.swift; sourceTree = "<group>"; };
@@ -45,6 +47,7 @@
 			isa = PBXGroup;
 			children = (
 				7CB7CE7E22BA9655BECE6B06 /* DailyPlanService.swift */,
+				523F2523CB209C8B6E09B844 /* ReviewScheduler.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -164,6 +167,7 @@
 				68B60621A8286C7E59C2A693 /* LearningStore.swift in Sources */,
 				8848FF91EBF8FB1E7FDDD414 /* MathContent.swift in Sources */,
 				6514F4F064BC1E3115778C67 /* MathTopApp.swift in Sources */,
+				AABBE463BDED34601A2506AB /* ReviewScheduler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

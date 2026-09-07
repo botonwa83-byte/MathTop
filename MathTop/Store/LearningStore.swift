@@ -5,6 +5,7 @@ final class LearningStore: ObservableObject {
     @Published private(set) var completedLessonIDs: Set<String> = []
     @Published private(set) var attempts: [Attempt] = []
     var incorrectAttempts: [Attempt] { attempts.filter { !$0.correct } }
+    var dueReviewCount: Int { attempts.filter { ReviewScheduler.isDue($0) }.count }
     private let defaults = UserDefaults.standard
     init() { load() }
     func markLessonCompleted(_ lesson: Lesson) { completedLessonIDs.insert(lesson.id); save() }
