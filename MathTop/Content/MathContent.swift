@@ -65,13 +65,35 @@ enum MathContent {
     ]
     static var lessons: [Lesson] { baseLessons.map { lesson in
         let extraKey = ["p-pattern": "p-pattern-extra", "p-fraction": "p-fraction-extra", "j-probability": "j-probability-extra"][lesson.id]
-        let lessonQuestions = questionBank[lesson.id] ?? []
+        let lessonQuestions = lesson.questions + (questionBank[lesson.id] ?? []) + bankQuestions(for: lesson.id)
         let extraQuestions = extraKey.flatMap { questionBank[$0] } ?? []
         let rawQuestions = ["p-pattern", "p-fraction"].contains(lesson.id)
             ? extraQuestions + lessonQuestions
             : lessonQuestions + extraQuestions
+        let curated = deduplicated(rawQuestions)
+        let questions = LessonPracticeFactory.questions(
+            for: lesson,
+            curated: curated,
+            peers: baseLessons.filter { $0.stage == lesson.stage }
+        )
+        return Lesson(
+            id: lesson.id,
+            title: lesson.title,
+            ability: lesson.ability,
+            subject: lesson.subject,
+            stage: lesson.stage,
+            minutes: max(lesson.minutes, min(15, 3 + questions.count)),
+            summary: lesson.summary,
+            questions: questions,
+            capabilities: lesson.capabilities
+        )
+    }.reduce(into: [String: Lesson]()) { $0[$1.id] = $1 }.map { $0.value }.sorted { $0.id < $1.id }
+    }
+
+    /// 同一题组内 id 必须唯一：原题库存在历史重复 id，这里按出现顺序补后缀。
+    private static func deduplicated(_ questions: [Question]) -> [Question] {
         var usedQuestionIDs = Set<String>()
-        let questions = rawQuestions.enumerated().map { index, question -> Question in
+        return questions.enumerated().map { index, question -> Question in
             guard usedQuestionIDs.contains(question.id) else {
                 usedQuestionIDs.insert(question.id)
                 return question
@@ -80,8 +102,14 @@ enum MathContent {
             usedQuestionIDs.insert(uniqueID)
             return Question(id: uniqueID, prompt: question.prompt, kind: question.kind, choices: question.choices, answer: question.answer, explanation: question.explanation, source: question.source)
         }
-        return Lesson(id: lesson.id, title: lesson.title, ability: lesson.ability, subject: lesson.subject, stage: lesson.stage, minutes: lesson.minutes, summary: lesson.summary, questions: questions, capabilities: lesson.capabilities)
-    }.reduce(into: [String: Lesson]()) { $0[$1.id] = $1 }.map { $0.value }.sorted { $0.id < $1.id } }
+    }
+
+    /// 把 `LessonPracticeBank` 里的策展草稿按知识点 id 转成正式题目。
+    private static func bankQuestions(for lessonID: String) -> [Question] {
+        (LessonPracticeBank.questions[lessonID] ?? []).enumerated().map { index, draft in
+            LessonPracticeFactory.makeQuestion(id: "\(lessonID)-b\(index + 1)", draft: draft)
+        }
+    }
 
     static func batch(_ lesson: Lesson, number: Int) -> [Question] {
         guard number > 0 else { return [] }
@@ -201,12 +229,8 @@ enum MathContent {
     ]
     private static func q(_ id: String, _ prompt: String, _ options: [String], _ answer: String, _ explanation: String) -> Question { Question(id: id, prompt: prompt, kind: .choice, choices: options.map { QuestionChoice(id: $0, text: $0) }, answer: answer, explanation: explanation) }
     private static func lesson(_ id: String, _ title: String, _ ability: String, _ stage: Stage, _ summary: String) -> Lesson {
-        let questions = [
-            Question(id: "\(id)-concept", prompt: "关于“\(title)”的第一步是什么？", kind: .choice, choices: [QuestionChoice(id: "a", text: "先说清定义"), QuestionChoice(id: "b", text: "直接跳过")], answer: "a", explanation: "先理解概念，再开始计算。"),
-            Question(id: "\(id)-apply", prompt: "学习“\(title)”后，怎样确认掌握？", kind: .choice, choices: [QuestionChoice(id: "a", text: "完成一道基础题"), QuestionChoice(id: "b", text: "只看答案")], answer: "a", explanation: "基础题可以验证方法是否掌握。"),
-            Question(id: "\(id)-review", prompt: "遇到“\(title)”时，更好的习惯是？", kind: .choice, choices: [QuestionChoice(id: "a", text: "写出步骤并检查"), QuestionChoice(id: "b", text: "凭感觉作答")], answer: "a", explanation: "写步骤能帮助发现思路中的错误。")
-        ]
-        return Lesson(id: id, title: title, ability: ability, subject: .math, stage: stage, minutes: 8, summary: summary, questions: questions)
+        // 题组由 LessonPracticeFactory 统一装配（策展题 + 派生题），这里不再塞通用模板题。
+        Lesson(id: id, title: title, ability: ability, subject: .math, stage: stage, minutes: 8, summary: summary, questions: [])
     }
     static func lessons(for stage: Stage) -> [Lesson] { lessons.filter { $0.stage == stage } }
 }

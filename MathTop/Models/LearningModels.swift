@@ -43,6 +43,17 @@ enum Capability: String, Codable, CaseIterable, Identifiable, Hashable {
         }
     }
 
+    /// 一句话说明这项能力在练什么，用于能力概览卡与知识点派生题。
+    var blurb: String {
+        switch self {
+        case .numberSense: return "估算、心算与数的大小感觉"
+        case .modeling: return "把生活情境写成数量关系"
+        case .reasoning: return "找规律、讲依据、做验证"
+        case .expression: return "把思路说清楚、写完整"
+        case .focusReflection: return "短时专注与错因复盘"
+        }
+    }
+
     static func defaultCapabilities(forAbility ability: String) -> [Capability] {
         var result: [Capability] = []
         func add(_ capability: Capability) {

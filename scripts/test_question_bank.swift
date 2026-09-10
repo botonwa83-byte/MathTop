@@ -8,11 +8,33 @@ struct QuestionBankRegressionTests {
         precondition(!lessons.isEmpty, "The catalog must load at startup")
         precondition(Set(lessons.map(\.id)).count == lessons.count, "Duplicate lesson IDs")
 
-        let expectedCounts = ["p-pattern": 24, "p-fraction": 5, "j-probability": 5]
-        for (id, count) in expectedCounts {
-            let lesson = lessons.first { $0.id == id }
-            precondition(lesson?.questions.count == count, "Lost questions while merging \(id)")
+        // 合并逻辑不能丢题：扩充题库里的原始题目必须逐题保留。
+        let retainedPrompts: [String: [String]] = [
+            "p-fraction": [
+                "一袋糖果的 3/8 是 24 颗，这袋糖果共有多少颗？",
+                "5/6－1/3 的结果是？",
+                "甲数的 2/5 等于乙数的 1/2，甲乙两数比是？",
+                "1/2 和 1/3 哪个大？",
+                "2/5+1/5=?"
+            ],
+            "j-probability": [
+                "同时掷两枚公平骰子，点数和为 7 的概率是？",
+                "从 1 到 10 中随机取一个数，取到偶数的概率是？",
+                "事件 A 发生概率为 0.7，则事件 A 不发生的概率是？"
+            ]
+        ]
+        for (id, prompts) in retainedPrompts {
+            guard let lesson = lessons.first(where: { $0.id == id }) else {
+                preconditionFailure("Missing lesson \(id)")
+            }
+            let existing = Set(lesson.questions.map(\.prompt))
+            for prompt in prompts where !existing.contains(prompt) {
+                preconditionFailure("Lost question while merging \(id): \(prompt)")
+            }
         }
+        // p-pattern 有 24 道扩充题，已超过每点最低题量，必须整批保留而不被派生题替换。
+        let patternCount = lessons.first { $0.id == "p-pattern" }?.questions.count ?? -1
+        precondition(patternCount == 24, "p-pattern must keep all 24 merged questions, got \(patternCount)")
 
         let questions = lessons.flatMap(\.questions)
         let duplicateQuestionIDs = Dictionary(grouping: questions, by: \.id).filter { $0.value.count > 1 }.map(\.key)
@@ -20,8 +42,36 @@ struct QuestionBankRegressionTests {
         for question in questions {
             precondition(Set(question.choices.map(\.id)).count == question.choices.count,
                          "Duplicate choice IDs in \(question.id)")
+            precondition(question.choices.count >= 3, "\(question.id) needs at least three choices")
             precondition(question.choices.contains { $0.id == question.answer },
                          "Invalid answer in \(question.id)")
+            precondition(!question.prompt.isEmpty, "\(question.id) needs a prompt")
+            precondition(!question.explanation.isEmpty, "\(question.id) needs an explanation")
+        }
+
+        // 每个知识点都必须有配套习题，且不低于最低题量。
+        var answerSlots = [0, 0, 0, 0]
+        for lesson in lessons {
+            precondition(lesson.questions.count >= LessonPracticeFactory.questionsPerPoint,
+                         "Lesson \(lesson.id) only has \(lesson.questions.count) questions")
+            let slotSum = lesson.questions.reduce(0) { total, question in
+                guard let slot = question.choices.firstIndex(where: { $0.id == question.answer }) else { return total }
+                if slot < answerSlots.count { answerSlots[slot] += 1 }
+                return total + 1
+            }
+            precondition(slotSum == lesson.questions.count, "Lesson \(lesson.id) has an answer outside its choices")
+        }
+        // 答案位置必须分散，不能整套题都落在 A。
+        precondition(answerSlots.allSatisfy { $0 > 0 }, "Answer slots are unbalanced: \(answerSlots)")
+        let maxSlotShare = Double(answerSlots.max() ?? 0) / Double(questions.count)
+        precondition(maxSlotShare < 0.5, "One answer slot holds \(maxSlotShare) of all questions")
+
+        // 练习批次要能覆盖整个题组，不能丢题。
+        for lesson in lessons {
+            let batches = (0..<LessonPracticeFactory.batchCount(for: lesson.questions))
+                .map { LessonPracticeFactory.batch(lesson.questions, index: $0) }
+            precondition(batches.flatMap { $0 }.count == lesson.questions.count,
+                         "Batching lost questions in \(lesson.id)")
         }
 
         // Persisted attempts depend on legacy question IDs retaining their original meaning.
@@ -79,6 +129,11 @@ struct QuestionBankRegressionTests {
         precondition(stagesWithActivities == Set(Stage.allCases), "Primary and junior stages both need activities")
         precondition(!MathContent.activities(for: .modeling, stage: .primary).isEmpty, "Primary modeling activities missing")
         precondition(!MathContent.activities(for: .reasoning, stage: .junior).isEmpty, "Junior reasoning activities missing")
-        print("PASS: catalog initialized; \(lessons.count) lessons, \(questions.count) unique questions; all merged questions retained")
+
+        let primary = MathContent.lessons(for: .primary)
+        let junior = MathContent.lessons(for: .junior)
+        print("PASS: catalog initialized; \(lessons.count) lessons (\(primary.count) primary / \(junior.count) junior), "
+              + "\(questions.count) unique questions, every lesson >= \(LessonPracticeFactory.questionsPerPoint); "
+              + "answer slots A/B/C/D = \(answerSlots)")
     }
 }
