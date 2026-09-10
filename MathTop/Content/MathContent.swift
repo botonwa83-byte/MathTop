@@ -1,6 +1,47 @@
 import Foundation
 
+struct MathPremiumModule: Identifiable, Hashable {
+    let id: String; let title: String; let pitch: String; let lessonIDs: [String]
+    static let all = [
+        MathPremiumModule(id: "contest", title: "竞赛与压轴题", pitch: "高阶代数、函数、几何证明与概率综合", lessonIDs: ["j-quadratic-eq", "j-proof", "j-trig", "j-probability"]),
+        MathPremiumModule(id: "geometry-lab", title: "几何可视化实验室", pitch: "三视图、轨迹、相似、圆与三角比", lessonIDs: ["j-figure", "j-locus", "j-trig", "j-ninth-circle"]),
+        MathPremiumModule(id: "word-problems", title: "小学应用题冲刺", pitch: "工程、行程、浓度、比例与统计图", lessonIDs: ["p-speed", "p-percent", "p-six-ratio", "p-six-stat"]),
+        MathPremiumModule(id: "review", title: "错题复盘与间隔复习", pitch: "按错误类型生成下一轮复习队列", lessonIDs: []),
+        MathPremiumModule(id: "assessment", title: "阶段测评报告", pitch: "分层测验、能力雷达与薄弱点建议", lessonIDs: [])
+    ]
+    static func lessons(for module: MathPremiumModule) -> [Lesson] {
+        if module.id == "review" || module.id == "assessment" { return MathContent.lessons }
+        if module.id == "contest" { return MathContent.lessons.filter { $0.stage == .junior && ["数与式", "方程", "函数", "图形几何", "统计概率", "建模推理"].contains($0.ability) } }
+        if module.id == "geometry-lab" { return MathContent.lessons.filter { $0.ability == "图形几何" } }
+        if module.id == "word-problems" { return MathContent.lessons.filter { $0.ability == "解决问题" || $0.ability == "统计概率" || $0.id.hasPrefix("p-") } }
+        return MathContent.lessons.filter { module.lessonIDs.contains($0.id) }
+    }
+}
+
 enum MathContent {
+    static let learningActivities: [LearningActivity] = [
+        LearningActivity(id: "act-p-shopping-discount", title: "超市折扣预算", mode: .transfer, prompt: "书包 80 元打九折，笔记本 12 元买 2 本减 3 元。先估算总价，再写出精确算式。", lessonID: "p-percent", stage: .primary, capabilities: [.numberSense, .modeling], minutes: 4, successCriteria: "能写出现价关系，并说明估算值和精确值为什么接近。", feedback: "你把折扣情境转成了数量关系，这是建模练习。"),
+        LearningActivity(id: "act-p-speed-trip", title: "放学路线规划", mode: .transfer, prompt: "家到图书馆 3 千米，步行每小时 4 千米，骑车每小时 12 千米。比较两种方式需要多久。", lessonID: "p-speed", stage: .primary, capabilities: [.modeling, .numberSense], minutes: 4, successCriteria: "能使用时间=路程÷速度，并用分钟表达结果。", feedback: "你能把速度、路程、时间放进同一个模型。"),
+        LearningActivity(id: "act-p-area-plan", title: "小花园面积规划", mode: .transfer, prompt: "长 8 米、宽 5 米的花园中间留一条宽 1 米的小路。估计还能种花的面积。", lessonID: "p-area", stage: .primary, capabilities: [.modeling, .reasoning], minutes: 5, successCriteria: "能说明总面积、小路面积和剩余面积之间的关系。", feedback: "你在真实空间中使用面积关系完成了迁移。"),
+        LearningActivity(id: "act-p-explain-fraction", title: "讲清分数比较", mode: .reflect, prompt: "向同学解释为什么 3/4 比 2/3 大，只说一句关键理由。", lessonID: "p-fraction", stage: .primary, capabilities: [.numberSense, .expression], minutes: 2, successCriteria: "能使用通分、画图或同整体比较中的一种理由。", feedback: "能说清理由，说明你不只是记答案。", choices: ["通分后比较", "画同样大小的图", "和 1 的距离比较"]),
+        LearningActivity(id: "act-p-focus-calculation", title: "3 分钟计算专注", mode: .focus, prompt: "选择 2 道今天的计算题，3 分钟内只做审题、列式、检查三件事。", lessonID: "p-four", stage: .primary, capabilities: [.focusReflection, .numberSense], minutes: 3, successCriteria: "能完整经历审题、列式、检查，不中途切换任务。", feedback: "专注完成比多刷题更能稳定正确率。"),
+        LearningActivity(id: "act-p-reflect-mistake", title: "错因定位卡", mode: .reflect, prompt: "从最近一次错题中选择卡点：审题、计算、表达、验证。", lessonID: nil, stage: .primary, capabilities: [.focusReflection, .expression], minutes: 2, successCriteria: "能选出一个具体卡点，并写出下一次检查动作。", feedback: "复盘把错题变成下一次的提醒。", choices: ["审题漏条件", "计算不稳定", "表达不清楚", "没有检验"]),
+        LearningActivity(id: "act-j-equation-model", title: "门票方程模型", mode: .transfer, prompt: "成人票 30 元，学生票 18 元，一共 20 人花了 480 元。设一个未知数并写出方程。", lessonID: "j-equation2", stage: .junior, capabilities: [.modeling, .reasoning], minutes: 4, successCriteria: "能说明未知数含义，并写出人数关系和金额关系。", feedback: "你把文字条件压缩成了可求解的方程模型。"),
+        LearningActivity(id: "act-j-function-taxi", title: "打车费用函数", mode: .transfer, prompt: "起步价 12 元含 3 千米，超过后每千米 2.4 元。写出超过 3 千米后的费用关系。", lessonID: "j-linear", stage: .junior, capabilities: [.modeling, .reasoning], minutes: 5, successCriteria: "能区分固定费用和变化费用，并写出一次函数关系。", feedback: "你抓住了函数中的固定量和变化量。"),
+        LearningActivity(id: "act-j-proof-explain", title: "证明依据复述", mode: .reflect, prompt: "选择一个几何结论，说出能支持它的一个判定或性质。", lessonID: "j-proof", stage: .junior, capabilities: [.reasoning, .expression], minutes: 3, successCriteria: "能把结论和依据连成一句完整表达。", feedback: "证明能力的核心是让每一步都有依据。", choices: ["全等判定", "平行线性质", "相似判定", "圆周角性质"]),
+        LearningActivity(id: "act-j-data-survey", title: "班级数据调查", mode: .transfer, prompt: "要了解班级一周运动时间，用平均数、中位数还是统计图说明更清楚？给出选择理由。", lessonID: "j-data", stage: .junior, capabilities: [.reasoning, .expression], minutes: 4, successCriteria: "能说明数据特征和表达方式之间的关系。", feedback: "你在选择数学工具，而不是机械计算。"),
+        LearningActivity(id: "act-j-probability-experiment", title: "概率实验设计", mode: .transfer, prompt: "设计 20 次摸球实验，估计摸到红球的概率。说明记录方式。", lessonID: "j-probability", stage: .junior, capabilities: [.reasoning, .modeling], minutes: 4, successCriteria: "能说清样本空间、次数和频率记录。", feedback: "你把概率从答案变成了可观察的实验。"),
+        LearningActivity(id: "act-j-reflect-strategy", title: "压轴题复盘句", mode: .reflect, prompt: "回想一道综合题，写下第一步为什么这样做。", lessonID: "j-challenge-real", stage: .junior, capabilities: [.focusReflection, .expression], minutes: 2, successCriteria: "能指出入口条件，例如变量、图形性质或数据关系。", feedback: "复盘第一步能帮助你下次更快进入题目。", choices: ["先设未知数", "先画图", "先找不变量", "先列数据表"])
+    ]
+
+    static func activities(for capability: Capability, stage: Stage) -> [LearningActivity] {
+        learningActivities.filter { $0.stage == stage && $0.capabilities.contains(capability) }
+    }
+
+    static func activities(for stage: Stage) -> [LearningActivity] {
+        learningActivities.filter { $0.stage == stage }
+    }
+
     private static let baseLessons: [Lesson] = [
         Lesson(id: "p-number-sense", title: "心算闪电脑", ability: "数感雷达", subject: .math, stage: .primary, minutes: 8, summary: "用拆分和凑整，让计算变成一条捷径。", questions: [Question(id: "p1", prompt: "48 × 25 = ?", kind: .choice, choices: [QuestionChoice(id: "1200", text: "1200"), QuestionChoice(id: "1000", text: "1000"), QuestionChoice(id: "960", text: "960")], answer: "1200", explanation: "25 × 4 = 100，再把 48 拆成 4 × 12。")]),
         Lesson(id: "p-fraction", title: "分数披萨店", ability: "分数直觉", subject: .math, stage: .primary, minutes: 7, summary: "比较分数大小，建立整体与部分的感觉。", questions: []),
@@ -22,11 +63,53 @@ enum MathContent {
         lesson("p-count", "数一数与比多少", "一年级基础", .primary, "10以内、20以内数数和比较大小"), lesson("p-add-sub", "加减法起步", "一年级基础", .primary, "20以内进位加法和退位减法"), lesson("p-shape", "认识图形", "一年级基础", .primary, "长方形、正方形、三角形和圆"), lesson("p-money", "认识人民币", "一年级基础", .primary, "元角分换算与简单购物"), lesson("p-table", "表内乘法", "二年级基础", .primary, "乘法意义、口诀和表内除法"), lesson("p-remainder", "有余数的除法", "二年级基础", .primary, "平均分、余数和简单应用题"), lesson("p-length", "长度单位", "二年级基础", .primary, "厘米、米、分米、毫米和测量"), lesson("p-multidigit", "多位数乘除法", "三年级基础", .primary, "两三位数乘一位数和除法估算"), lesson("p-fraction1", "分数初识", "三年级基础", .primary, "认识几分之一、同分母分数比较"), lesson("p-perimeter1", "周长入门", "三年级基础", .primary, "图形周长和长方形周长"), lesson("p-decimal1", "小数初识", "三年级基础", .primary, "小数读写、大小比较和加减"), lesson("p-multifraction", "分数运算", "四年级基础", .primary, "同分母分数加减和简单应用"), lesson("p-angle1", "角和线", "四年级基础", .primary, "直线、射线、线段、平行与垂直"), lesson("p-multi", "大数乘法", "四年级基础", .primary, "三位数乘两位数和除数是两位数"), lesson("p-five-fraction", "分数通关", "五年级基础", .primary, "分数乘法、除法和混合运算"), lesson("p-volume1", "长方体和正方体", "五年级基础", .primary, "棱长、表面积、体积和容积"), lesson("p-six-ratio", "比例应用", "六年级基础", .primary, "比例尺、图形放大缩小和正反比例"), lesson("p-six-circle", "圆形世界", "六年级基础", .primary, "圆周长、面积和扇形认识"), lesson("p-six-stat", "扇形统计图", "六年级基础", .primary, "百分数、扇形统计图和生活应用"),
         lesson("j-seventh-algebra", "代数式入门", "七年级基础", .junior, "用字母表示数、代数式求值和合并同类项"), lesson("j-seventh-lines", "相交线与平行线", "七年级基础", .junior, "对顶角、同位角、内错角和判定"), lesson("j-eighth-factor", "因式分解进阶", "八年级基础", .junior, "提公因式与平方差、完全平方公式"), lesson("j-eighth-data", "数据的波动", "八年级基础", .junior, "极差、方差与数据稳定性"), lesson("j-eighth-rotation", "图形的旋转", "八年级基础", .junior, "中心对称、旋转作图和性质"), lesson("j-ninth-circle", "圆与位置关系", "九年级基础", .junior, "点线圆位置关系、切线与弧长"), lesson("j-ninth-projection", "投影与视图", "九年级基础", .junior, "平行投影、中心投影和三视图"), lesson("j-ninth-practical", "数学建模任务", "九年级基础", .junior, "用方程、函数和统计解决综合问题")
     ]
-    static var lessons: [Lesson] { (baseLessons + extendedLessons).map { lesson in
-        guard let questions = questionBank[lesson.id], !questions.isEmpty else { return lesson }
-        return Lesson(id: lesson.id, title: lesson.title, ability: lesson.ability, subject: lesson.subject, stage: lesson.stage, minutes: lesson.minutes, summary: lesson.summary, questions: questions)
-    } }
+    static var lessons: [Lesson] { baseLessons.map { lesson in
+        let extraKey = ["p-pattern": "p-pattern-extra", "p-fraction": "p-fraction-extra", "j-probability": "j-probability-extra"][lesson.id]
+        let rawQuestions = (questionBank[lesson.id] ?? []) + (extraKey.flatMap { questionBank[$0] } ?? [])
+        var usedQuestionIDs = Set<String>()
+        let questions = rawQuestions.enumerated().map { index, question -> Question in
+            guard usedQuestionIDs.contains(question.id) else {
+                usedQuestionIDs.insert(question.id)
+                return question
+            }
+            let uniqueID = "\(question.id)-extra-\(index)"
+            usedQuestionIDs.insert(uniqueID)
+            return Question(id: uniqueID, prompt: question.prompt, kind: question.kind, choices: question.choices, answer: question.answer, explanation: question.explanation, source: question.source)
+        }
+        return Lesson(id: lesson.id, title: lesson.title, ability: lesson.ability, subject: lesson.subject, stage: lesson.stage, minutes: lesson.minutes, summary: lesson.summary, questions: questions, capabilities: lesson.capabilities)
+    }.reduce(into: [String: Lesson]()) { $0[$1.id] = $1 }.map { $0.value }.sorted { $0.id < $1.id } }
+
+    static func batch(_ lesson: Lesson, number: Int) -> [Question] {
+        guard number > 0 else { return [] }
+        let start = (number - 1) * 30
+        let existing = Array(lesson.questions.dropFirst(start).prefix(30))
+        if existing.count == 30 { return existing }
+        let templates = ["读题后第一步通常是？", "列式前应先找出什么？", "计算结果后为什么要检验？", "单位不一致时应先做什么？", "选择图表时应依据什么？", "几何题中辅助线的作用是？", "方程应用题的等量关系来自哪里？", "概率题的分母表示什么？", "函数图像中横轴通常表示什么？", "分数比较时可采用什么方法？"]
+        let generated = (existing.count..<30).map { i in
+            Question(id: "sim-\(lesson.id)-\(number)-\(i)", prompt: "仿真题\(i + 1)：\(templates[i % templates.count])", kind: .choice, choices: [QuestionChoice(id: "a", text: "先读条件，再列式验证"), QuestionChoice(id: "b", text: "只凭直觉猜答案"), QuestionChoice(id: "c", text: "忽略单位和条件")], answer: "a", explanation: "数学仿真题统一采用‘读条件—建立关系—计算—检验’的步骤。", source: "小学/初中数学 · 仿真题（规则生成）")
+        }
+        return existing + generated
+    }
+
+    /// 固定的一百道小学/初中仿真题，拆成三批供集中训练和复习使用。
+    static func simulationBatch(_ number: Int) -> [Question] {
+        guard (1...3).contains(number) else { return [] }
+        let curated = lessons.flatMap(\.questions).filter { $0.source?.contains("仿真题") == true || $0.id.hasPrefix("jcr-") || $0.id.hasPrefix("p-word-extra-") }
+        let generated = lessons.flatMap { lesson in
+            batch(lesson, number: 1).filter { $0.source?.contains("仿真题") == true }
+        }
+        let selected = Array((curated + generated).prefix(100))
+        let start = number == 1 ? 0 : number == 2 ? 34 : 67
+        let count = number == 1 ? 34 : 33
+        return Array(selected.dropFirst(start).prefix(count))
+    }
+
     private static let questionBank: [String: [Question]] = [
+        "p-fraction": [q("p-fraction-1", "一袋糖果的 3/8 是 24 颗，这袋糖果共有多少颗？", ["48", "64", "72"], "64", "用部分量除以对应分率：24÷3/8=64。"), q("p-fraction-2", "5/6－1/3 的结果是？", ["1/2", "2/3", "4/6"], "1/2", "先把 1/3 化成 2/6，再相减得 3/6=1/2。"), q("p-fraction-3", "甲数的 2/5 等于乙数的 1/2，甲乙两数比是？", ["4:5", "5:4", "2:5"], "5:4", "设相等量为 1，甲=5/2，乙=2，故比为 5:4。")],
+        "p-pattern": [q("p-pattern-1", "数列 2、5、10、17、26，下一项是？", ["35", "37", "39"], "37", "相邻差为 3、5、7、9，下一差为 11。"), q("p-pattern-2", "用小棒摆正方形：1 个用 4 根，2 个相连用 7 根，摆 n 个需要？", ["3n+1", "4n", "2n+2"], "3n+1", "第一个 4 根，之后每增加一个只需 3 根。")],
+        "j-equation": [q("j-equation-1", "某数的 3 倍比它大 18，这个数是？", ["6", "9", "12"], "9", "设数为 x，3x=x+18，解得 x=9。"), q("j-equation-2", "一件商品打八折后售价 96 元，原价是？", ["120元", "128元", "160元"], "120元", "原价×0.8=96，所以原价 96÷0.8=120。"), q("j-equation-3", "解方程 5(x-2)=3x+6。", ["x=6", "x=8", "x=10"], "x=8", "展开得 5x-10=3x+6，移项得 2x=16。" )],
+        "j-function": [q("j-function-1", "一次函数 y=−3x+2 的图像经过哪个象限？", ["第一、二、四象限", "第一、三象限", "第二、三、四象限"], "第一、二、四象限", "截距为正、斜率为负，图像经过一、二、四象限。"), q("j-function-2", "若 y=(m−1)x+3 随 x 增大而减小，则 m 的范围是？", ["m>1", "m<1", "m=1"], "m<1", "一次项系数 m−1<0。"), q("j-function-3", "直线 y=2x+b 经过点 (1,5)，b 等于？", ["2", "3", "5"], "3", "代入得 5=2+b，所以 b=3。" )],
+        "j-probability": [q("j-probability-1", "同时掷两枚公平骰子，点数和为 7 的概率是？", ["1/12", "1/6", "1/3"], "1/6", "和为 7 有 6 种，全部 36 种，概率为 6/36=1/6。"), q("j-probability-2", "从 1 到 10 中随机取一个数，取到偶数的概率是？", ["1/5", "1/2", "3/5"], "1/2", "偶数有 5 个，样本空间有 10 个。"), q("j-probability-3", "事件 A 发生概率为 0.7，则事件 A 不发生的概率是？", ["0.2", "0.3", "0.7"], "0.3", "互斥完备事件概率和为 1，1−0.7=0.3。" )],
         "p-four": [q("p-four-1", "125 + 376 = ?", ["401", "501", "601"], "501", "先算个位，再算十位和百位。"), q("p-four-2", "900 - 458 = ?", ["442", "452", "462"], "442", "注意退位：900-400-58=442。"), q("p-four-3", "25 × 16 最简便的算法是？", ["25×8×2", "25+16", "25×10+6"], "25×8×2", "先把 16 拆成 8×2。")],
         "p-decimal": [q("p-decimal-1", "3.6 + 2.45 = ?", ["5.05", "6.05", "6.5"], "6.05", "小数点对齐后再相加。"), q("p-decimal-2", "4.8 ÷ 10 = ?", ["48", "0.48", "0.048"], "0.48", "除以 10，小数点向左移动一位。")],
         "p-percent": [q("p-percent-1", "一件 80 元商品打九折，现价多少？", ["72元", "70元", "78元"], "72元", "80×90%=72。"), q("p-percent-2", "25 是 200 的百分之几？", ["8%", "12.5%", "25%"], "12.5%", "25÷200=12.5%。")],
@@ -38,8 +121,8 @@ enum MathContent {
         "j-linear": [q("j-linear-1", "一次函数 y=2x+1 的斜率是？", ["1", "2", "3"], "2", "x 的系数就是斜率。"), q("j-linear-2", "y=3x-2 中 x=0 时 y=?", ["-2", "0", "2"], "-2", "代入 x=0。")],
         "j-pythagoras": [q("j-pythagoras-1", "直角边 3、4 的直角三角形斜边？", ["5", "6", "7"], "5", "3²+4²=5²。"), q("j-pythagoras-2", "勾股定理适用于？", ["任意三角形", "直角三角形", "等边三角形"], "直角三角形", "它描述直角三角形三边关系。")],
         "j-data": [q("j-data-1", "数据 2、4、6 的平均数？", ["3", "4", "6"], "4", "总和 12 除以 3。"), q("j-data-2", "一组数据中出现次数最多的数叫？", ["平均数", "中位数", "众数"], "众数", "众数是频数最多的值。")],
-        "p-pattern": [q("p-pattern-1", "数列 3、6、9、12，下一项是？", ["13", "15", "18"], "15", "相邻两项都增加 3。"), q("p-pattern-2", "数列 2、4、8、16，下一项是？", ["20", "24", "32"], "32", "相邻两项都乘以 2。"), q("p-pattern-3", "数列 5、10、15、20，下一项是？", ["21", "25", "30"], "25", "每次增加 5。"), q("p-pattern-4", "数列 1、4、7、10，下一项是？", ["12", "13", "14"], "13", "每次增加 3。"), q("p-pattern-5", "数列 10、20、40、80，下一项是？", ["100", "120", "160"], "160", "每次乘以 2。"), q("p-pattern-6", "数列 30、27、24、21，下一项是？", ["18", "19", "20"], "18", "每次减少 3。"), q("p-pattern-7", "数列 2、5、8、11，下一项是？", ["13", "14", "15"], "14", "每次增加 3。"), q("p-pattern-8", "数列 4、8、12、16，规律是？", ["加4", "乘4", "减4"], "加4", "相邻项差为 4。"), q("p-pattern-9", "数列 81、27、9、3，下一项是？", ["1", "2", "6"], "1", "每次除以 3。"), q("p-pattern-10", "数列 1、3、6、10，下一项是？", ["12", "15", "16"], "15", "依次加 2、3、4、5。"), q("p-pattern-11", "数列 100、90、80、70，下一项是？", ["50", "60", "65"], "60", "每次减少 10。"), q("p-pattern-12", "数列 7、14、21、28，下一项是？", ["32", "35", "42"], "35", "每次增加 7。"), q("p-pattern-13", "数列 3、9、27，下一项是？", ["54", "81", "90"], "81", "每次乘以 3。"), q("p-pattern-14", "数列 50、45、40，下一项是？", ["30", "35", "38"], "35", "每次减少 5。"), q("p-pattern-15", "数列 2、6、12、20，下一项是？", ["24", "30", "36"], "30", "依次为 1×2、2×3、3×4、4×5、5×6。"), q("p-pattern-16", "数列 1、2、4、7、11，下一项是？", ["15", "16", "17"], "16", "依次加 1、2、3、4、5。"), q("p-pattern-17", "数列 64、32、16，下一项是？", ["4", "8", "12"], "8", "每次除以 2。"), q("p-pattern-18", "数列 6、12、18、24，下一项是？", ["28", "30", "36"], "30", "每次增加 6。"), q("p-pattern-19", "数列 9、18、36，下一项是？", ["54", "72", "81"], "72", "每次乘以 2。"), q("p-pattern-20", "数列 40、35、30、25，下一项是？", ["15", "20", "22"], "20", "每次减少 5。"), q("p-pattern-21", "数列 1、4、9、16，下一项是？", ["20", "24", "25"], "25", "依次为 1²、2²、3²、4²、5²。"), q("p-pattern-22", "数列 2、3、5、8，下一项是？", ["11", "12", "13"], "13", "后一项是前两项之和。")],
-        "p-fraction": [q("p-fraction-1", "1/2 和 1/3 哪个大？", ["1/2", "1/3", "一样大"], "1/2", "分子相同为 1 时，分母越小分数越大。"), q("p-fraction-2", "2/5+1/5=?", ["3/5", "3/10", "2/10"], "3/5", "同分母分数分母不变，分子相加。")],
+        "p-pattern-extra": [q("p-pattern-1", "数列 3、6、9、12，下一项是？", ["13", "15", "18"], "15", "相邻两项都增加 3。"), q("p-pattern-2", "数列 2、4、8、16，下一项是？", ["20", "24", "32"], "32", "相邻两项都乘以 2。"), q("p-pattern-3", "数列 5、10、15、20，下一项是？", ["21", "25", "30"], "25", "每次增加 5。"), q("p-pattern-4", "数列 1、4、7、10，下一项是？", ["12", "13", "14"], "13", "每次增加 3。"), q("p-pattern-5", "数列 10、20、40、80，下一项是？", ["100", "120", "160"], "160", "每次乘以 2。"), q("p-pattern-6", "数列 30、27、24、21，下一项是？", ["18", "19", "20"], "18", "每次减少 3。"), q("p-pattern-7", "数列 2、5、8、11，下一项是？", ["13", "14", "15"], "14", "每次增加 3。"), q("p-pattern-8", "数列 4、8、12、16，规律是？", ["加4", "乘4", "减4"], "加4", "相邻项差为 4。"), q("p-pattern-9", "数列 81、27、9、3，下一项是？", ["1", "2", "6"], "1", "每次除以 3。"), q("p-pattern-10", "数列 1、3、6、10，下一项是？", ["12", "15", "16"], "15", "依次加 2、3、4、5。"), q("p-pattern-11", "数列 100、90、80、70，下一项是？", ["50", "60", "65"], "60", "每次减少 10。"), q("p-pattern-12", "数列 7、14、21、28，下一项是？", ["32", "35", "42"], "35", "每次增加 7。"), q("p-pattern-13", "数列 3、9、27，下一项是？", ["54", "81", "90"], "81", "每次乘以 3。"), q("p-pattern-14", "数列 50、45、40，下一项是？", ["30", "35", "38"], "35", "每次减少 5。"), q("p-pattern-15", "数列 2、6、12、20，下一项是？", ["24", "30", "36"], "30", "依次为 1×2、2×3、3×4、4×5、5×6。"), q("p-pattern-16", "数列 1、2、4、7、11，下一项是？", ["15", "16", "17"], "16", "依次加 1、2、3、4、5。"), q("p-pattern-17", "数列 64、32、16，下一项是？", ["4", "8", "12"], "8", "每次除以 2。"), q("p-pattern-18", "数列 6、12、18、24，下一项是？", ["28", "30", "36"], "30", "每次增加 6。"), q("p-pattern-19", "数列 9、18、36，下一项是？", ["54", "72", "81"], "72", "每次乘以 2。"), q("p-pattern-20", "数列 40、35、30、25，下一项是？", ["15", "20", "22"], "20", "每次减少 5。"), q("p-pattern-21", "数列 1、4、9、16，下一项是？", ["20", "24", "25"], "25", "依次为 1²、2²、3²、4²、5²。"), q("p-pattern-22", "数列 2、3、5、8，下一项是？", ["11", "12", "13"], "13", "后一项是前两项之和。")],
+        "p-fraction-extra": [q("p-fraction-1", "1/2 和 1/3 哪个大？", ["1/2", "1/3", "一样大"], "1/2", "分子相同为 1 时，分母越小分数越大。"), q("p-fraction-2", "2/5+1/5=?", ["3/5", "3/10", "2/10"], "3/5", "同分母分数分母不变，分子相加。")],
         "p-ratio": [q("p-ratio-1", "2:3 的前项是？", ["2", "3", "5"], "2", "比号前的数叫前项。"), q("p-ratio-2", "10:15 化简为？", ["2:3", "3:2", "10:5"], "2:3", "前后项同时除以 5。")],
         "p-volume": [q("p-volume-1", "长 3、宽 2、高 4 的长方体体积？", ["9", "18", "24"], "24", "体积=长×宽×高。"), q("p-volume-2", "1立方分米等于多少立方厘米？", ["10", "100", "1000"], "1000", "体积单位进率是 1000。")],
         "p-stat": [q("p-stat-1", "条形统计图最适合表示？", ["数量多少", "变化趋势", "部分占比"], "数量多少", "条形图便于比较数量。"), q("p-stat-2", "3、5、7 的平均数？", ["4", "5", "6"], "5", "总和 15 除以 3。")],
@@ -106,7 +189,11 @@ enum MathContent {
             q("jcr-26", "正多边形每个外角为 45°，边数？", ["6", "8", "10"], "8", "外角和 360°，360÷45=8。"), q("jcr-27", "圆内接四边形一内角 110°，对角？", ["70°", "80°", "110°"], "70°", "圆内接四边形对角互补。"), q("jcr-28", "两圆半径 3、5，圆心距 8，位置关系？", ["外切", "相交", "内切"], "外切", "圆心距等于两半径之和。"), q("jcr-29", "一组数据方差为 0，说明？", ["所有数据相等", "平均数为0", "没有数据"], "所有数据相等", "各数据与平均数的差均为0。"), q("jcr-30", "从 1、2、3、4 中随机取一数，取到质数概率？", ["1/4", "1/2", "3/4"], "1/2", "质数为2、3，共2个。"),
             q("jcr-31", "不等式组 x>1 且 x≤4 的整数解个数？", ["2", "3", "4"], "3", "整数解为2、3、4。"), q("jcr-32", "若分式方程 2/x=1 的解？", ["1", "2", "-2"], "2", "两边乘 x 得2=x，且x不为0。"), q("jcr-33", "二次函数 y=x²-4x+1 的对称轴？", ["x=-2", "x=2", "x=4"], "x=2", "对称轴 x=-b/(2a)=2。"), q("jcr-34", "直线 y=2x-1 与 y=-x+5 交点横坐标？", ["1", "2", "3"], "2", "令2x-1=-x+5，得x=2。"), q("jcr-35", "三角形三边 5、12、13，面积？", ["30", "60", "65"], "30", "这是直角三角形，面积=5×12÷2。"),
             q("jcr-36", "菱形对角线 6、8，面积？", ["24", "48", "96"], "24", "菱形面积为对角线乘积的一半。"), q("jcr-37", "圆锥底面积 12、高 6，体积？", ["24", "36", "72"], "24", "圆锥体积=1/3×12×6。"), q("jcr-38", "样本 4、6、8、10 加入 12 后平均数？", ["7", "8", "9"], "8", "总和40除以5。"), q("jcr-39", "甲乙速度比 3:2，相同时间路程比？", ["2:3", "3:2", "9:4"], "3:2", "时间相同时路程比等于速度比。"), q("jcr-40", "含盐率 10% 的盐水 200 克，含盐？", ["10克", "20克", "40克"], "20克", "200×10%=20。")
-        ]
+        ],
+        "p-transform": [q("p-transform-1", "平移后的图形大小是否改变？", ["不变", "变大", "变小"], "不变", "平移只改变位置，不改变形状大小。"), q("p-transform-2", "轴对称图形对应点到对称轴距离？", ["相等", "一大一小", "无法判断"], "相等", "对称点关于对称轴距离相等。")],
+        "p-solid": [q("p-solid-1", "从上面看长方体可能看到？", ["长方形", "圆", "三角形"], "长方形", "视线方向决定看到的平面形状。"), q("p-solid-2", "正方体有几条棱？", ["8", "12", "6"], "12", "正方体有 12 条相等的棱。")],
+        "p-chart": [q("p-chart-1", "折线统计图更适合看？", ["变化趋势", "单个数量", "图形面积"], "变化趋势", "折线连接数据点，便于观察变化。"), q("p-chart-2", "扇形统计图一个扇形越大表示？", ["占比越大", "人数一定少", "时间更长"], "占比越大", "扇形角度反映部分占整体比例。")],
+        "j-probability-extra": [q("j-probability-1", "袋中 3 个红球、1 个白球，摸到红球概率？", ["1/4", "3/4", "1"], "3/4", "红球数除以球的总数。"), q("j-probability-2", "必然事件的概率？", ["0", "1/2", "1"], "1", "必然发生的事件概率为 1。")]
     ]
     private static func q(_ id: String, _ prompt: String, _ options: [String], _ answer: String, _ explanation: String) -> Question { Question(id: id, prompt: prompt, kind: .choice, choices: options.map { QuestionChoice(id: $0, text: $0) }, answer: answer, explanation: explanation) }
     private static func lesson(_ id: String, _ title: String, _ ability: String, _ stage: Stage, _ summary: String) -> Lesson {
