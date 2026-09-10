@@ -33,10 +33,14 @@ enum GrowthSummaryService {
             return lhs.mastery > rhs.mastery
         }
         let top = sortedByMastery.first(where: { $0.practiceCount > 0 }).map { item(for: $0, weak: false) }
-        let weak = snapshots.sorted { lhs, rhs in
-            if lhs.mastery == rhs.mastery { return lhs.practiceCount < rhs.practiceCount }
-            return lhs.mastery < rhs.mastery
-        }.first.map { item(for: $0, weak: true) }
+        // 没有任何学习记录时不给「待加强」结论，避免对刚打开 App 的用户凭空下判断。
+        let hasAnyRecord = !store.activityEvents.isEmpty || !store.attempts.isEmpty
+        let weak = hasAnyRecord
+            ? snapshots.sorted { lhs, rhs in
+                if lhs.mastery == rhs.mastery { return lhs.practiceCount < rhs.practiceCount }
+                return lhs.mastery < rhs.mastery
+            }.first.map { item(for: $0, weak: true) }
+            : nil
 
         let nextStep: String
         if store.activityEvents.isEmpty && store.attempts.isEmpty {

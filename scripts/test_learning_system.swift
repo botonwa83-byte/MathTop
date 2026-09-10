@@ -8,6 +8,7 @@ struct LearningSystemRegressionTests {
         try testEmptyGrowthSummaryIsActionable()
         try testDailyPlanBuildsCompleteLearningLoop()
         try testDailyPlanPrioritizesDueReview()
+        try testHomeActivityPanelPersistsPartialProgress()
         print("PASS: learning system regression tests")
     }
 
@@ -146,6 +147,50 @@ struct LearningSystemRegressionTests {
         precondition(plan.session.activities.map(\.mode).contains(.reflect), "Daily plan missing reflection activity")
         precondition((10...15).contains(plan.estimatedMinutes), "Daily plan should last 10-15 minutes")
         precondition(plan.primary.stage == .primary, "Primary plan should pick primary lesson")
+
+        defaults.removePersistentDomain(forName: suiteName)
+    }
+
+    /// 首页任务包链路：练习活动挂在真实题目上 → 逐步完成后进度被保留 → 任务包完成并产生能力成长。
+    private static func testHomeActivityPanelPersistsPartialProgress() throws {
+        let suiteName = "MathTopHomePanelTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        let now = fixedDate(2026, 9, 10)
+        let calendar = fixedCalendar()
+        let store = LearningStore(defaults: defaults, now: { now }, calendar: calendar)
+
+        let first = DailyPlanService.makePlan(stage: .primary, store: store, now: now, calendar: calendar)
+        let practice = first.session.activities.first { $0.mode == .practice }
+        precondition(practice != nil, "Missing practice activity")
+        precondition(!practice!.questionIDs.isEmpty, "Practice activity has no questions to answer")
+        precondition(
+            practice!.questionIDs.allSatisfy { id in first.primary.questions.contains { $0.id == id } },
+            "Practice activity references questions outside the primary lesson"
+        )
+
+        store.completeActivity(practice!, in: first.session)
+        var partial = DailyPlanService.makePlan(stage: .primary, store: store, now: now, calendar: calendar)
+        precondition(partial.session.id == first.session.id, "Same-day session should be reused instead of rebuilt")
+        precondition(
+            partial.session.completedActivityIDs == [practice!.id],
+            "Partial progress was lost: \(partial.session.completedActivityIDs)"
+        )
+
+        for activity in partial.session.activities where !partial.session.completedActivityIDs.contains(activity.id) {
+            store.completeActivity(activity, in: partial.session)
+            partial = DailyPlanService.makePlan(stage: .primary, store: store, now: now, calendar: calendar)
+        }
+        precondition(partial.session.isCompleted, "Session should be completed after all activities")
+        precondition(store.completedSessionsCount == 1, "Expected exactly one completed session")
+        precondition(!store.activityEvents.isEmpty, "Activity events should be recorded for growth")
+
+        let summary = GrowthSummaryService.make(store: store, now: now, calendar: calendar)
+        precondition(
+            summary.capabilitySnapshots.contains { $0.practiceCount > 0 },
+            "Capability growth should pick up completed activities"
+        )
+        precondition(summary.weakCapability != nil, "A used store should still report a capability to strengthen")
 
         defaults.removePersistentDomain(forName: suiteName)
     }
