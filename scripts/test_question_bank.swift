@@ -24,10 +24,14 @@ struct QuestionBankRegressionTests {
                          "Invalid answer in \(question.id)")
         }
 
-        // Keep old IDs attached to their original answers when moving existing questions.
-        for (id, answer) in ["p-pattern-1": "37", "p-fraction-1": "64", "j-probability-1": "1/6"] {
+        // Persisted attempts depend on legacy question IDs retaining their original meaning.
+        for (id, answer) in ["p-pattern-1": "15", "p-fraction-1": "1/2"] {
             precondition(questions.first { $0.id == id }?.answer == answer, "Changed meaning of \(id)")
         }
+        precondition(questions.contains { $0.id != "p-pattern-1" && $0.answer == "37" },
+                     "Lost the newer pattern question while preserving its legacy ID")
+        precondition(questions.contains { $0.id != "p-fraction-1" && $0.answer == "64" },
+                     "Lost the newer fraction question while preserving its legacy ID")
         for stage in Stage.allCases {
             precondition(!MathContent.lessons(for: stage).isEmpty, "Missing stage \(stage)")
         }

@@ -65,7 +65,11 @@ enum MathContent {
     ]
     static var lessons: [Lesson] { baseLessons.map { lesson in
         let extraKey = ["p-pattern": "p-pattern-extra", "p-fraction": "p-fraction-extra", "j-probability": "j-probability-extra"][lesson.id]
-        let rawQuestions = (questionBank[lesson.id] ?? []) + (extraKey.flatMap { questionBank[$0] } ?? [])
+        let lessonQuestions = questionBank[lesson.id] ?? []
+        let extraQuestions = extraKey.flatMap { questionBank[$0] } ?? []
+        let rawQuestions = ["p-pattern", "p-fraction"].contains(lesson.id)
+            ? extraQuestions + lessonQuestions
+            : lessonQuestions + extraQuestions
         var usedQuestionIDs = Set<String>()
         let questions = rawQuestions.enumerated().map { index, question -> Question in
             guard usedQuestionIDs.contains(question.id) else {
