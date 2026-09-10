@@ -3,7 +3,12 @@ import SwiftUI
 @main
 struct MathTopApp: App {
     @StateObject private var store = LearningStore()
-    var body: some Scene { WindowGroup { MainTabView().environmentObject(store) } }
+    var body: some Scene { WindowGroup { MathRootView().environmentObject(store) } }
+}
+
+struct MathRootView: View {
+    @State private var entered = false
+    var body: some View { Group { if entered { MainTabView() } else { MathPromoView { withAnimation { entered = true } } } } }
 }
 
 let ink = Color(red: 0.09, green: 0.13, blue: 0.20)
@@ -36,8 +41,8 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 22) {
                     HStack {
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("早上好，小探险家").font(.title2.bold()).foregroundStyle(ink)
-                            Text("今天也来解锁一种新能力吧").font(.subheadline).foregroundStyle(.secondary)
+                            Text("MathTop · 数学登顶").font(.caption.bold()).foregroundStyle(coral)
+                            Text("今天训练建模推理力").font(.title2.bold()).foregroundStyle(ink)
                         }
                         Spacer()
                         ZStack { Circle().fill(mint.opacity(0.35)); Text("L3").font(.caption.bold()).foregroundStyle(ink) }.frame(width: 46, height: 46)
@@ -126,7 +131,7 @@ struct PathView: View {
         }.navigationTitle("能力地图") }
     }
     @ViewBuilder private func row(_ lesson: Lesson) -> some View {
-        NavigationLink { SkillDetailView(title: lesson.title, detail: lesson.summary) } label: {
+        NavigationLink { SkillDetailView(lesson: lesson) } label: {
             HStack { Image(systemName: store.completedLessonIDs.contains(lesson.id) ? "checkmark.circle.fill" : "circle.dashed").foregroundStyle(store.completedLessonIDs.contains(lesson.id) ? .green : coral); VStack(alignment: .leading) { Text(lesson.ability).font(.headline); Text("\(lesson.minutes) 分钟 · \(lesson.title)").font(.caption).foregroundStyle(.secondary) }; Spacer(); if store.completedLessonIDs.contains(lesson.id) { Text("已掌握").font(.caption.bold()).foregroundStyle(.green) } }
         }
     }
@@ -144,7 +149,7 @@ struct CurriculumListView: View {
             let lessons = MathContent.lessons(for: stage)
             Section("共 \(lessons.count) 个知识点") {
                 ForEach(lessons) { lesson in
-                    NavigationLink { SkillDetailView(title: lesson.title, detail: lesson.summary) } label: {
+                    NavigationLink { SkillDetailView(lesson: lesson) } label: {
                         HStack { Image(systemName: store.completedLessonIDs.contains(lesson.id) ? "checkmark.circle.fill" : "circle").foregroundStyle(store.completedLessonIDs.contains(lesson.id) ? .green : coral); VStack(alignment: .leading) { Text(lesson.title).font(.headline); Text(lesson.ability).font(.caption).foregroundStyle(.secondary) }; Spacer(); Text("\(lesson.questions.count)题").font(.caption).foregroundStyle(.secondary) }
                     }
                 }
@@ -157,12 +162,129 @@ struct ErrorBookView: View {
     @EnvironmentObject private var store: LearningStore
     var body: some View { List { if store.incorrectAttempts.isEmpty { VStack(spacing: 12) { Image(systemName: "checkmark.seal").font(.largeTitle).foregroundStyle(.green); Text("还没有错题").font(.headline); Text("完成练习后，答错的题会自动出现在这里。").font(.caption).foregroundStyle(.secondary) }.frame(maxWidth: .infinity).padding(.vertical, 40) } else { ForEach(store.incorrectAttempts) { attempt in HStack { Image(systemName: "arrow.uturn.backward.circle").foregroundStyle(coral); VStack(alignment: .leading) { Text("知识点练习").font(.headline); Text(attempt.date, style: .date).font(.caption).foregroundStyle(.secondary) }; Spacer(); Text("待复习").font(.caption).foregroundStyle(coral) } } } }.navigationTitle("错题变身器") }
 }
-struct SkillDetailView: View { let title: String; let detail: String; var body: some View { VStack(alignment: .leading, spacing: 18) { Text(title).font(.largeTitle.bold()); Text(detail).font(.title3).foregroundStyle(.secondary); Text("从一个小任务开始，练会后再挑战下一格。").font(.body); Spacer(); Button("开始练习") {}.font(.headline).frame(maxWidth: .infinity).padding().background(ink).foregroundStyle(.white).clipShape(Capsule()) }.padding(24).navigationTitle("能力详情") } }
+struct SkillDetailView: View {
+    let lesson: Lesson
+    @EnvironmentObject private var store: LearningStore
+    @State private var showPractice = false
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text(lesson.title).font(.largeTitle.bold())
+            Text(lesson.summary).font(.title3).foregroundStyle(.secondary)
+            Text("本课 \(lesson.questions.count) 道题，完成后会记录掌握进度并把错题加入复习。")
+                .font(.body)
+            Spacer()
+            Button { showPractice = true } label: {
+                Label("开始练习", systemImage: "play.fill").font(.headline).frame(maxWidth: .infinity).padding().background(ink).foregroundStyle(.white).clipShape(Capsule())
+            }
+            .disabled(lesson.questions.isEmpty)
+        }
+        .padding(24).navigationTitle("能力详情")
+        .sheet(isPresented: $showPractice) { PracticeView(lesson: lesson) { store.markLessonCompleted(lesson); showPractice = false } }
+    }
+}
 struct KnowledgeDetailView: View { let title: String; var body: some View { List { Section("今天复习") { Label("3 个新知识点", systemImage: "sparkles"); Label("5 道轻练习", systemImage: "checkmark.circle") }; Section("掌握进度") { ProgressView(value: 0.62).tint(coral) } }.navigationTitle(title) } }
 struct ProfileView: View {
     @EnvironmentObject private var store: LearningStore
-    var body: some View { NavigationStack { VStack(spacing: 18) { Circle().fill(mint).frame(width: 86, height: 86).overlay(Text("小探险家").font(.caption.bold()).foregroundStyle(ink)); Text("小探险家").font(.title2.bold()); Text("数学能力成长档案").font(.subheadline).foregroundStyle(.secondary); HStack(spacing: 12) { stat("\(store.completedLessonIDs.count)", "已解锁"); stat("\(MathContent.lessons.count)", "知识点"); stat("\(store.attempts.count)", "已练题") }.padding(.top, 10); ProgressView(value: Double(store.completedLessonIDs.count), total: Double(max(MathContent.lessons.count, 1))).tint(coral); NavigationLink { GrowthSummaryView() } label: { Label("查看成长摘要", systemImage: "chart.bar.xaxis").font(.headline).frame(maxWidth: .infinity).padding().background(Color.white).foregroundStyle(ink).clipShape(RoundedRectangle(cornerRadius: 14)) }; Text("继续从能力地图选择一个知识点，完成今日 10 分钟训练。").font(.caption).foregroundStyle(.secondary); Spacer() }.padding(24).navigationTitle("我的") } }
+    var body: some View { NavigationStack { VStack(spacing: 18) { Circle().fill(mint).frame(width: 86, height: 86).overlay(Text("小探险家").font(.caption.bold()).foregroundStyle(ink)); Text("小探险家").font(.title2.bold()); Text("数学能力成长档案").font(.subheadline).foregroundStyle(.secondary); HStack(spacing: 12) { stat("\(store.completedLessonIDs.count)", "已解锁"); stat("\(MathContent.lessons.count)", "知识点"); stat("\(store.attempts.count)", "已练题") }.padding(.top, 10); ProgressView(value: Double(store.completedLessonIDs.count), total: Double(max(MathContent.lessons.count, 1))).tint(coral); NavigationLink { SimulationCatalogView() } label: { Label("100道三批仿真题", systemImage: "list.number").font(.headline).frame(maxWidth: .infinity).padding().background(mint).foregroundStyle(ink).clipShape(RoundedRectangle(cornerRadius: 14)) }; NavigationLink { GrowthSummaryView() } label: { Label("查看成长摘要", systemImage: "chart.bar.xaxis").font(.headline).frame(maxWidth: .infinity).padding().background(Color.white).foregroundStyle(ink).clipShape(RoundedRectangle(cornerRadius: 14)) }; NavigationLink { MathPremiumCatalogView() } label: { Label("探索五大进阶模块", systemImage: "sparkles").font(.headline).frame(maxWidth: .infinity).padding().background(coral).foregroundStyle(.white).clipShape(RoundedRectangle(cornerRadius: 14)) }; Text("继续从能力地图选择一个知识点，完成今日 10 分钟训练。").font(.caption).foregroundStyle(.secondary); Spacer() }.padding(24).navigationTitle("我的") } }
     private func stat(_ value: String, _ label: String) -> some View { VStack { Text(value).font(.title3.bold()).foregroundStyle(coral); Text(label).font(.caption).foregroundStyle(.secondary) }.frame(maxWidth: .infinity).padding().background(Color.white).clipShape(RoundedRectangle(cornerRadius: 14)) }
+}
+
+/// 一批固定的仿真题：100 道被拆成三批，便于集中训练和分阶段复习。
+struct SimulationBatch: Identifiable {
+    let number: Int
+    let stage: Stage
+    let title: String
+    let focus: String
+    let questions: [Question]
+
+    var id: Int { number }
+
+    var lesson: Lesson {
+        Lesson(
+            id: "simulation-batch-\(number)",
+            title: "仿真题 · \(title)",
+            ability: "综合训练",
+            subject: .math,
+            stage: stage,
+            minutes: max(10, questions.count),
+            summary: focus,
+            questions: questions
+        )
+    }
+
+    static let all: [SimulationBatch] = [
+        SimulationBatch(number: 1, stage: .junior, title: "压轴精选", focus: "初中综合与压轴题：方程、函数、几何、统计概率逐题带解析。", questions: MathContent.simulationBatch(1)),
+        SimulationBatch(number: 2, stage: .primary, title: "应用与过渡", focus: "小学典型应用题，衔接初中收尾题与规则生成题，重点训练审题建模。", questions: MathContent.simulationBatch(2)),
+        SimulationBatch(number: 3, stage: .primary, title: "基础判断", focus: "读题、列式、检验等基础步骤判断题，适合限时快速过题。", questions: MathContent.simulationBatch(3))
+    ]
+}
+
+struct SimulationCatalogView: View {
+    @EnvironmentObject private var store: LearningStore
+    @AppStorage("simulationCompletedBatches") private var completedRaw = ""
+    @State private var activeBatch: SimulationBatch?
+
+    private var completedNumbers: Set<Int> { Set(completedRaw.split(separator: ",").compactMap { Int($0) }) }
+
+    var body: some View {
+        List {
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("100 道仿真题 · 三批集中训练").font(.headline)
+                    Text("每批约 33 道，全部为选择题并附带解析。做完一批会留下完成标记，方便按批推进和复习。")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                HStack(spacing: 12) {
+                    summaryStat("\(SimulationBatch.all.reduce(0) { $0 + $1.questions.count })", "总题量")
+                    summaryStat("\(completedNumbers.count)", "已完成批次")
+                    summaryStat("\(SimulationBatch.all.count)", "批次")
+                }.padding(.vertical, 4)
+            }
+            Section("选择批次") {
+                ForEach(SimulationBatch.all) { batch in
+                    Button { activeBatch = batch } label: {
+                        HStack(spacing: 14) {
+                            ZStack {
+                                Circle().fill(completedNumbers.contains(batch.number) ? mint : coral.opacity(0.16))
+                                Text("\(batch.number)").font(.headline).foregroundStyle(completedNumbers.contains(batch.number) ? ink : coral)
+                            }.frame(width: 40, height: 40)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("第 \(batch.number) 批 · \(batch.title)").font(.headline).foregroundStyle(ink)
+                                Text("\(batch.questions.count) 题 · \(batch.stage.rawValue)").font(.caption).foregroundStyle(.secondary)
+                                Text(batch.focus).font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                            }
+                            Spacer(minLength: 8)
+                            if completedNumbers.contains(batch.number) {
+                                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                            }
+                            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+                        }.padding(.vertical, 6)
+                    }
+                }
+            }
+        }
+        .navigationTitle("仿真题训练")
+        .sheet(item: $activeBatch) { batch in
+            PracticeView(lesson: batch.lesson) { markCompleted(batch.number) }.environmentObject(store)
+        }
+    }
+
+    private func markCompleted(_ number: Int) {
+        var numbers = completedNumbers
+        numbers.insert(number)
+        completedRaw = numbers.sorted().map(String.init).joined(separator: ",")
+    }
+
+    private func summaryStat(_ value: String, _ label: String) -> some View {
+        VStack(spacing: 4) {
+            Text(value).font(.title3.bold()).foregroundStyle(coral)
+            Text(label).font(.caption).foregroundStyle(.secondary)
+        }.frame(maxWidth: .infinity)
+    }
+}
+
+struct MathPremiumCatalogView: View {
+    var body: some View { List { Section("一次解锁，持续更新") { Text("每个模块都连接现有题库，先看清训练方向，再进入对应知识点。\n免费预览首个知识点，完整训练与报告在解锁后开放。\n\n\(MathPremiumModule.all.map { "• \($0.title)：\($0.pitch)" }.joined(separator: "\\n"))").font(.body) }; ForEach(MathPremiumModule.all) { module in NavigationLink { List { Section(module.title) { Text(module.pitch); ForEach(MathPremiumModule.lessons(for: module)) { lesson in Label("\(lesson.title) · \(lesson.questions.count)题", systemImage: "checkmark.circle") } } } .navigationTitle(module.title) } label: { VStack(alignment: .leading) { Text(module.title).font(.headline); Text(module.pitch).font(.caption).foregroundStyle(.secondary) } } } }.navigationTitle("进阶模块") }
 }
 
 struct GrowthSummaryView: View {
