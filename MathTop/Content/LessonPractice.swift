@@ -19,7 +19,9 @@ struct PracticeDraft {
 /// 人工策展题库：`小学` 与 `初中` 两份，按知识点 id 索引。
 enum LessonPracticeBank {
     static var questions: [String: [PracticeDraft]] {
-        PrimaryPracticeBank.questions.merging(JuniorPracticeBank.questions) { primary, _ in primary }
+        PrimaryPracticeBank.questions
+            .merging(JuniorPracticeBank.questions) { primary, _ in primary }
+            .merging(SupplementPracticeBank.questions) { existing, supplement in existing + supplement }
     }
 }
 
