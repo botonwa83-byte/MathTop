@@ -2,6 +2,12 @@ import SwiftUI
 
 struct MathPromoView: View {
     let onEnter: () -> Void
+    @ObservedObject private var purchase = MathPurchaseManager.shared
+    @State private var showPaywall = false
+
+    /// 价格以 ASC 为准；未加载出来时不编造数字，只留「一杯奶茶」的比喻。
+    private var priceLabel: String { purchase.product?.displayPrice ?? "（一杯奶茶）" }
+
     var body: some View {
         ZStack {
             LinearGradient(colors: [ink, Color(red: 0.16, green: 0.24, blue: 0.34)], startPoint: .top, endPoint: .bottom).ignoresSafeArea()
@@ -17,11 +23,17 @@ struct MathPromoView: View {
                     }
                     HStack { stat("\(MathContent.lessons.count)", "知识点"); Divider().frame(height: 28); stat("\(MathContent.lessons.reduce(0) { $0 + $1.questions.count })", "练习题"); Divider().frame(height: 28); stat("5", "进阶模块") }.padding().background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: Metric.radiusPanel))
                     Text("学习能力闭环：看懂情境 → 建立模型 → 推导验证 → 迁移复盘").font(.caption).foregroundStyle(mint).multilineTextAlignment(.center).padding(.vertical, Metric.tight)
+                    MathFamilyAdSection(current: .math, onDark: true)
+                    MathUnlockAskCard(price: priceLabel, onDark: true, onUnlock: { showPaywall = true }, onBrowse: { onEnter() })
                     Text("MathTop · 数学登顶  v1.0.0\n© 2026 Top King. All rights reserved.").font(.caption).multilineTextAlignment(.center).foregroundStyle(.white.opacity(0.45)).padding(.vertical, Metric.cardPadding)
                     Button(action: onEnter) { Label("开启数学登顶之旅", systemImage: "arrow.right").font(.headline).frame(maxWidth: .infinity).padding().background(coral, in: RoundedRectangle(cornerRadius: Metric.radiusPanel)).foregroundStyle(.white) }.padding(.bottom, Metric.blockGap)
                 }.padding(.horizontal, 24).frame(maxWidth: 600)
             }
             skipButton
+        }
+        .sheet(isPresented: $showPaywall) { MathPaywallView() }
+        .onChange(of: purchase.isUnlocked) { unlocked in
+            if unlocked { onEnter() }
         }
     }
 

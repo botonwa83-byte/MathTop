@@ -13,6 +13,7 @@ struct MathPaywallView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: Metric.sectionGap) {
                     hero
+                    MathMilkTeaPitchCard()
                     benefits
                     freeTierNote
                     purchaseArea
@@ -119,6 +120,8 @@ struct MathPaywallView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+
+            MathFamilyAdSection(current: .math)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("购买即视为同意《用户协议》与《隐私政策》。付款通过 Apple 账户完成，换机后可用「恢复购买」找回。")
