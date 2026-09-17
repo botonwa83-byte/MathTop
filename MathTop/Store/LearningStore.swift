@@ -39,6 +39,10 @@ final class LearningStore: ObservableObject {
         self.now = now
         self.calendar = calendar
         load()
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willResignActiveNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in self?.flushNow() }
     }
 
     func markLessonCompleted(_ lesson: Lesson) {
@@ -139,7 +143,24 @@ final class LearningStore: ObservableObject {
         lastStudyDate = defaults.object(forKey: Keys.lastStudyDate) as? Date
     }
 
+    /// 合并写入：一次作答里的多次改动只在 0.25 秒后落盘一次。
+    private var needsSave = false
+    private var saveScheduled = false
+
     private func save() {
+        needsSave = true
+        guard !saveScheduled else { return }
+        saveScheduled = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+            guard let self else { return }
+            self.saveScheduled = false
+            if self.needsSave { self.flushNow() }
+        }
+    }
+
+    /// 立即落盘（App 进入后台时必须调用，避免丢数据）。
+    func flushNow() {
+        needsSave = false
         defaults.set(Array(completedLessonIDs), forKey: Keys.completedLessonIDs)
         if let data = try? JSONEncoder().encode(attempts) {
             defaults.set(data, forKey: Keys.attempts)

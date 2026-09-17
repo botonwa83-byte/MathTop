@@ -63,7 +63,8 @@ enum MathContent {
         lesson("p-count", "数一数与比多少", "一年级基础", .primary, "10以内、20以内数数和比较大小"), lesson("p-add-sub", "加减法起步", "一年级基础", .primary, "20以内进位加法和退位减法"), lesson("p-shape", "认识图形", "一年级基础", .primary, "长方形、正方形、三角形和圆"), lesson("p-money", "认识人民币", "一年级基础", .primary, "元角分换算与简单购物"), lesson("p-table", "表内乘法", "二年级基础", .primary, "乘法意义、口诀和表内除法"), lesson("p-remainder", "有余数的除法", "二年级基础", .primary, "平均分、余数和简单应用题"), lesson("p-length", "长度单位", "二年级基础", .primary, "厘米、米、分米、毫米和测量"), lesson("p-multidigit", "多位数乘除法", "三年级基础", .primary, "两三位数乘一位数和除法估算"), lesson("p-fraction1", "分数初识", "三年级基础", .primary, "认识几分之一、同分母分数比较"), lesson("p-perimeter1", "周长入门", "三年级基础", .primary, "图形周长和长方形周长"), lesson("p-decimal1", "小数初识", "三年级基础", .primary, "小数读写、大小比较和加减"), lesson("p-multifraction", "分数运算", "四年级基础", .primary, "同分母分数加减和简单应用"), lesson("p-angle1", "角和线", "四年级基础", .primary, "直线、射线、线段、平行与垂直"), lesson("p-multi", "大数乘法", "四年级基础", .primary, "三位数乘两位数和除数是两位数"), lesson("p-five-fraction", "分数通关", "五年级基础", .primary, "分数乘法、除法和混合运算"), lesson("p-volume1", "长方体和正方体", "五年级基础", .primary, "棱长、表面积、体积和容积"), lesson("p-six-ratio", "比例应用", "六年级基础", .primary, "比例尺、图形放大缩小和正反比例"), lesson("p-six-circle", "圆形世界", "六年级基础", .primary, "圆周长、面积和扇形认识"), lesson("p-six-stat", "扇形统计图", "六年级基础", .primary, "百分数、扇形统计图和生活应用"),
         lesson("j-seventh-algebra", "代数式入门", "七年级基础", .junior, "用字母表示数、代数式求值和合并同类项"), lesson("j-seventh-lines", "相交线与平行线", "七年级基础", .junior, "对顶角、同位角、内错角和判定"), lesson("j-eighth-factor", "因式分解进阶", "八年级基础", .junior, "提公因式与平方差、完全平方公式"), lesson("j-eighth-data", "数据的波动", "八年级基础", .junior, "极差、方差与数据稳定性"), lesson("j-eighth-rotation", "图形的旋转", "八年级基础", .junior, "中心对称、旋转作图和性质"), lesson("j-ninth-circle", "圆与位置关系", "九年级基础", .junior, "点线圆位置关系、切线与弧长"), lesson("j-ninth-projection", "投影与视图", "九年级基础", .junior, "平行投影、中心投影和三视图"), lesson("j-ninth-practical", "数学建模任务", "九年级基础", .junior, "用方程、函数和统计解决综合问题")
     ]
-    static var lessons: [Lesson] { baseLessons.map { lesson in
+    /// 题库拼接较重，这里只构建一次（原先每次访问都重建全部题目）。
+    static let lessons: [Lesson] = { baseLessons.map { lesson in
         let extraKey = ["p-pattern": "p-pattern-extra", "p-fraction": "p-fraction-extra", "j-probability": "j-probability-extra"][lesson.id]
         let lessonQuestions = lesson.questions + (questionBank[lesson.id] ?? []) + bankQuestions(for: lesson.id)
         let extraQuestions = extraKey.flatMap { questionBank[$0] } ?? []
@@ -88,7 +89,7 @@ enum MathContent {
             capabilities: lesson.capabilities
         )
     }.reduce(into: [String: Lesson]()) { $0[$1.id] = $1 }.map { $0.value }.sorted { $0.id < $1.id }
-    }
+    }()
 
     /// 同一题组内 id 必须唯一：原题库存在历史重复 id，这里按出现顺序补后缀。
     private static func deduplicated(_ questions: [Question]) -> [Question] {
