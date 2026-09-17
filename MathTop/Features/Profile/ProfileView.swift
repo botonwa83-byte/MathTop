@@ -3,6 +3,8 @@ import SwiftUI
 /// 我的：学习档案、工具入口与成长摘要。
 struct ProfileView: View {
     @EnvironmentObject private var store: LearningStore
+    @ObservedObject private var purchase = MathPurchaseManager.shared
+    @State private var showPaywall = false
 
     private var summary: GrowthSummary { GrowthSummaryService.make(store: store) }
 
@@ -11,6 +13,7 @@ struct ProfileView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: Metric.sectionGap) {
                     profileCard
+                    if !purchase.isUnlocked { unlockCard }
                     overviewGrid
                     toolsSection
                     aboutSection
@@ -18,10 +21,41 @@ struct ProfileView: View {
                 .padding(.horizontal, Metric.gutter)
                 .padding(.top, 8)
                 .padding(.bottom, 32)
+                .mathReadableWidth()
             }
             .screenBackground()
             .navigationTitle("我的")
+            .sheet(isPresented: $showPaywall) { MathPaywallView() }
         }
+    }
+
+    private var unlockCard: some View {
+        Button { showPaywall = true } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 44)
+                    .background(Color.white.opacity(0.20))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("解锁完整版").font(AppFont.cardTitle).foregroundStyle(.white)
+                    Text("完整题组 · 进阶模块 · 仿真全三批 · 一次买断")
+                        .font(AppFont.caption)
+                        .foregroundStyle(.white.opacity(0.92))
+                }
+                Spacer(minLength: 4)
+                Text(purchase.product?.displayPrice ?? "¥22")
+                    .font(AppFont.cardTitle)
+                    .foregroundStyle(.white)
+            }
+            .padding(14)
+            .background(
+                LinearGradient(colors: [Palette.accent, Color(hex: 0xE0912F)], startPoint: .leading, endPoint: .trailing)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: Metric.radiusCard, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 
     private var profileCard: some View {
@@ -106,16 +140,29 @@ struct ProfileView: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink { MathPremiumCatalogView() } label: {
-                    ActionRow(
-                        icon: "sparkles",
-                        title: "进阶模块",
-                        subtitle: "竞赛压轴、几何实验室、应用题冲刺、阶段测评",
-                        tint: Color(hex: 0x8A6BE2),
-                        trailingText: "\(MathPremiumModule.all.count) 个"
-                    )
+                if purchase.isUnlocked {
+                    NavigationLink { MathPremiumCatalogView() } label: {
+                        ActionRow(
+                            icon: "sparkles",
+                            title: "进阶模块",
+                            subtitle: "竞赛压轴、几何实验室、应用题冲刺、阶段测评",
+                            tint: Color(hex: 0x8A6BE2),
+                            trailingText: "\(MathPremiumModule.all.count) 个"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    Button { showPaywall = true } label: {
+                        ActionRow(
+                            icon: "lock.fill",
+                            title: "进阶模块",
+                            subtitle: "竞赛压轴、几何实验室、应用题冲刺、阶段测评（完整版解锁后开放）",
+                            tint: Color(hex: 0x8A6BE2),
+                            trailingText: "完整版"
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
     }
@@ -129,6 +176,7 @@ struct ProfileView: View {
                 aboutRow("每个知识点配套题量", "不少于 \(LessonPracticeFactory.questionsPerPoint) 道")
                 aboutRow("学习活动库", "\(MathContent.learningActivities.count) 个情境任务")
                 Divider().overlay(Palette.line)
+                MathLegalLinksView()
                 Text("MathTop · 数学登顶  v1.0.0\n© 2026 Top King. All rights reserved.")
                     .font(AppFont.caption)
                     .foregroundStyle(Palette.textTertiary)
@@ -225,6 +273,7 @@ struct GrowthSummaryView: View {
             }
             .padding(Metric.gutter)
             .padding(.bottom, 24)
+            .mathReadableWidth()
         }
         .screenBackground()
         .navigationTitle("成长摘要")

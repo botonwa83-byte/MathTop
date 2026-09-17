@@ -14,6 +14,8 @@ struct PracticeView: View {
     let onComplete: () -> Void
 
     @EnvironmentObject private var store: LearningStore
+    // 单例注入：付费状态是全局的，sheet / NavigationLink 都不需要再传 env
+    @ObservedObject private var purchase = MathPurchaseManager.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var chunkIndex = 0
@@ -22,15 +24,19 @@ struct PracticeView: View {
     @State private var submitted = false
     @State private var answeredCount = 0
     @State private var correctCount = 0
+    @State private var showPaywall = false
+
+    /// 免费档：未解锁时只开放每个知识点前 N 题（内购划线，改动需同步 testFreeTierPolicy）。
+    private var pool: [Question] { purchase.availableQuestions(for: lesson) }
 
     private var chunkCount: Int {
-        guard let chunkSize, chunkSize > 0, !lesson.questions.isEmpty else { return 1 }
-        return max(1, Int(ceil(Double(lesson.questions.count) / Double(chunkSize))))
+        guard let chunkSize, chunkSize > 0, !pool.isEmpty else { return 1 }
+        return max(1, Int(ceil(Double(pool.count) / Double(chunkSize))))
     }
 
     private var questions: [Question] {
-        guard let chunkSize, chunkSize > 0 else { return lesson.questions }
-        return Array(lesson.questions.dropFirst(chunkIndex * chunkSize).prefix(chunkSize))
+        guard let chunkSize, chunkSize > 0 else { return pool }
+        return Array(pool.dropFirst(chunkIndex * chunkSize).prefix(chunkSize))
     }
 
     private var question: Question? { questions.indices.contains(step) ? questions[step] : nil }
@@ -67,6 +73,7 @@ struct PracticeView: View {
                     Text(lesson.title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
                 }
             }
+            .sheet(isPresented: $showPaywall) { MathPaywallView() }
         }
     }
 
@@ -75,7 +82,7 @@ struct PracticeView: View {
     private var header: some View {
         HStack(spacing: 8) {
             TagBadge(text: lesson.ability, tint: lesson.stage.tint)
-            TagBadge(text: "共 \(lesson.questions.count) 题", tint: Palette.textSecondary)
+            TagBadge(text: "共 \(pool.count) 题", tint: Palette.textSecondary)
             if chunkCount > 1 {
                 TagBadge(text: "第 \(chunkIndex + 1)/\(chunkCount) 批", tint: Palette.info, icon: "square.stack.3d.up")
             }
@@ -197,6 +204,18 @@ struct PracticeView: View {
                 Text("还有 \(chunkCount - chunkIndex - 1) 批（约 \((chunkCount - chunkIndex - 1) * (chunkSize ?? 5)) 题）在等你。")
                     .font(AppFont.caption)
                     .foregroundStyle(Palette.textTertiary)
+            }
+            if purchase.hasLockedQuestions(in: lesson) {
+                VStack(spacing: 8) {
+                    Text("这个知识点还有 \(lesson.questions.count - MathPurchaseManager.freeQuestionsPerLesson) 道完整题组未解锁")
+                        .font(AppFont.caption)
+                        .foregroundStyle(Palette.textSecondary)
+                        .multilineTextAlignment(.center)
+                    PrimaryButton(title: "解锁完整版", icon: "lock.open.fill", tint: Palette.accent, enabled: true) {
+                        showPaywall = true
+                    }
+                }
+                .padding(.top, 4)
             }
         }
         .frame(maxWidth: .infinity)

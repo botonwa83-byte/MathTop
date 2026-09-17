@@ -201,3 +201,23 @@ extension View {
         self.background(Palette.paper.ignoresSafeArea())
     }
 }
+
+// MARK: - iPad 可读宽度
+
+/// 大屏（iPad / 横屏）下限制内容最大宽度并居中，iPhone 不受影响。
+/// 所有竖向滚动页面的内容都应套一层，避免 iPad 上文字行长失控。
+struct MathReadableWidthModifier: ViewModifier {
+    var maxWidth: CGFloat = 720
+
+    func body(content: Content) -> some View {
+        content
+            .frame(maxWidth: maxWidth)
+            .frame(maxWidth: .infinity, alignment: .center)
+    }
+}
+
+extension View {
+    func mathReadableWidth(_ maxWidth: CGFloat = 720) -> some View {
+        modifier(MathReadableWidthModifier(maxWidth: maxWidth))
+    }
+}

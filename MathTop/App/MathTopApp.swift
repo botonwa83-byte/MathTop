@@ -3,8 +3,13 @@ import SwiftUI
 @main
 struct MathTopApp: App {
     @StateObject private var store = LearningStore()
+    @StateObject private var purchase = MathPurchaseManager.shared
     var body: some Scene {
-        WindowGroup { MathRootView().environmentObject(store) }
+        WindowGroup {
+            MathRootView()
+                .environmentObject(store)
+                .environmentObject(purchase)
+        }
     }
 }
 

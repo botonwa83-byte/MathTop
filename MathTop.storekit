@@ -1,0 +1,41 @@
+{
+  "identifier" : "3C7A1D9E-2B4F-4A6C-9D81-5E7F0A2B4C6D",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "22.00",
+      "familyShareable" : false,
+      "internalID" : "7A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D",
+      "localizations" : [
+        {
+          "description" : "一次买断，解锁全部知识点的完整题组（每个知识点不少于 10 道）、五个进阶方向、仿真题全三批（100 道）与阶段测评。错题本、成长摘要、仿真第 1 批与每知识点前 3 题永久免费。无订阅、无续费，支持换机恢复购买。",
+          "displayName" : "完整版解锁",
+          "locale" : "zh_CN"
+        }
+      ],
+      "productID" : "com.mathtop.app.full_unlock",
+      "referenceName" : "MathTop Full Unlock",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "0",
+    "_developerTeamID" : "0",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 0,
+    "_locale" : "zh_CN",
+    "_storefront" : "CHN",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

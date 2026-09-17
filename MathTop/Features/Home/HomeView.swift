@@ -37,6 +37,7 @@ struct HomeView: View {
                     .padding(.horizontal, Metric.gutter)
                     .padding(.top, 12)
                     .padding(.bottom, 32)
+                    .mathReadableWidth()
                 }
                 .onAppear {
                     guard let target = scrollTarget else { return }

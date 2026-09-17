@@ -51,9 +51,12 @@ struct SimulationBatch: Identifiable {
 /// 仿真题目录：三批集中训练。
 struct SimulationCatalogView: View {
     @EnvironmentObject private var store: LearningStore
+    // 单例注入：付费状态是全局的，sheet / NavigationLink 都不需要再传 env
+    @ObservedObject private var purchase = MathPurchaseManager.shared
 
     @AppStorage("simulationCompletedBatches") private var completedRaw = ""
     @State private var activeBatch: SimulationBatch?
+    @State private var showPaywall = false
 
     private var completedNumbers: Set<Int> {
         Set(completedRaw.split(separator: ",").compactMap { Int($0) })
@@ -98,6 +101,7 @@ struct SimulationCatalogView: View {
             .padding(.horizontal, Metric.gutter)
             .padding(.top, 8)
             .padding(.bottom, 32)
+            .mathReadableWidth()
         }
         .screenBackground()
         .navigationTitle("仿真题训练")
@@ -106,12 +110,17 @@ struct SimulationCatalogView: View {
                 markCompleted(batch.number)
             }
             .environmentObject(store)
+            .environmentObject(purchase)
         }
+        .sheet(isPresented: $showPaywall) { MathPaywallView() }
     }
 
     private func batchCard(_ batch: SimulationBatch) -> some View {
         let done = completedNumbers.contains(batch.number)
-        return Button { activeBatch = batch } label: {
+        let locked = purchase.isSimulationBatchLocked(batch.number)
+        return Button {
+            if locked { showPaywall = true } else { activeBatch = batch }
+        } label: {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 12) {
                     ZStack {
@@ -131,10 +140,11 @@ struct SimulationCatalogView: View {
                             TagBadge(text: "\(batch.questions.count) 题", tint: Palette.textSecondary)
                             TagBadge(text: batch.stage.rawValue, tint: batch.stage.tint)
                             if done { TagBadge(text: "已完成", tint: Palette.success, icon: "checkmark") }
+                            if locked { TagBadge(text: "完整版", tint: Palette.warning, icon: "lock.fill") }
                         }
                     }
                     Spacer(minLength: 4)
-                    Image(systemName: "chevron.right")
+                    Image(systemName: locked ? "lock.fill" : "chevron.right")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Palette.textTertiary)
                 }

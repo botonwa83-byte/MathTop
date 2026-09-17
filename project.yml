@@ -10,6 +10,7 @@ settings:
     MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: "1"
     DEVELOPMENT_LANGUAGE: zh-Hans
+    TARGETED_DEVICE_FAMILY: "1,2"
 targets:
   MathTop:
     type: application
@@ -25,4 +26,36 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        # 免加密合规问询：本 App 仅使用 Apple 标准 HTTPS，未使用自有加密
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         ENABLE_PREVIEWS: YES
+  MathTopTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: MathTop
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mathtop.tests
+        PRODUCT_NAME: MathTopTests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  MathTop:
+    build:
+      targets:
+        MathTop: all
+        MathTopTests: [test]
+    run:
+      config: Debug
+      storeKitConfiguration: MathTop.storekit
+    test:
+      config: Debug
+      targets:
+        - MathTopTests
+      storeKitConfiguration: MathTop.storekit
+    profile:
+      config: Release
+      storeKitConfiguration: MathTop.storekit

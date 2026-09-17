@@ -86,6 +86,7 @@ struct NotebookView: View {
                 .padding(.horizontal, Metric.gutter)
                 .padding(.top, 8)
                 .padding(.bottom, 32)
+                .mathReadableWidth()
             }
             .screenBackground()
             .navigationTitle("知识本")
