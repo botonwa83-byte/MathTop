@@ -11,6 +11,9 @@ struct PracticeView: View {
     var session: StudySession? = nil
     var activity: LearningActivity? = nil
     var chunkSize: Int? = LessonPracticeFactory.batchSize
+    /// 仿真题批次在外层已按批次判定过锁，这里传 true 走完整题量，
+    /// 否则会被免费档（每知识点前 3 题）截断，导致「第 1 批 34 题免费」名不副实。
+    var fullAccess: Bool = false
     let onComplete: () -> Void
 
     @EnvironmentObject private var store: LearningStore
@@ -27,7 +30,9 @@ struct PracticeView: View {
     @State private var showPaywall = false
 
     /// 免费档：未解锁时只开放每个知识点前 N 题（内购划线，改动需同步 testFreeTierPolicy）。
-    private var pool: [Question] { purchase.availableQuestions(for: lesson) }
+    private var pool: [Question] {
+        fullAccess ? lesson.questions : purchase.availableQuestions(for: lesson)
+    }
 
     private var chunkCount: Int {
         guard let chunkSize, chunkSize > 0, !pool.isEmpty else { return 1 }
@@ -59,7 +64,8 @@ struct PracticeView: View {
                     }
                     .padding(.horizontal, Metric.gutter)
                     .padding(.top, 18)
-                    .padding(.bottom, 24)
+                    .padding(.bottom, Metric.blockGap)
+                    .mathReadableWidth()
                 }
                 bottomBar
             }
@@ -92,14 +98,14 @@ struct PracticeView: View {
                 .foregroundStyle(Palette.textSecondary)
         }
         .padding(.horizontal, Metric.gutter)
-        .padding(.top, 8)
+        .padding(.top, Metric.tight)
     }
 
     private var progressBar: some View {
         ProgressView(value: Double(min(step, questions.count)), total: Double(max(questions.count, 1)))
             .tint(Palette.accent)
             .padding(.horizontal, Metric.gutter)
-            .padding(.top, 10)
+            .padding(.top, Metric.chipGap)
     }
 
     // MARK: 题目
@@ -110,7 +116,7 @@ struct PracticeView: View {
             .font(AppFont.question)
             .foregroundStyle(Palette.textPrimary)
             .fixedSize(horizontal: false, vertical: true)
-            .padding(.vertical, 18)
+            .padding(.vertical, Metric.cardPadding)
             .padding(.horizontal, Metric.cardPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Palette.surface)
@@ -156,7 +162,7 @@ struct PracticeView: View {
                 }
             }
             .padding(.vertical, 13)
-            .padding(.horizontal, 14)
+            .padding(.horizontal, Metric.fieldPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(isPicked || (submitted && isCorrect) ? tint.opacity(0.10) : Palette.surface)
             .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
@@ -219,7 +225,7 @@ struct PracticeView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 34)
+        .padding(.vertical, Metric.heroGap)
         .padding(.horizontal, Metric.cardPadding)
         .background(Palette.surface)
         .clipShape(RoundedRectangle(cornerRadius: Metric.radiusCard, style: .continuous))
@@ -245,7 +251,7 @@ struct PracticeView: View {
             }
         }
         .padding(.horizontal, Metric.gutter)
-        .padding(.top, 12)
+        .padding(.top, Metric.stack)
         .padding(.bottom, 8)
         .background(.ultraThinMaterial)
     }

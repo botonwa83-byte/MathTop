@@ -84,8 +84,8 @@ struct NotebookView: View {
                     }
                 }
                 .padding(.horizontal, Metric.gutter)
-                .padding(.top, 8)
-                .padding(.bottom, 32)
+                .padding(.top, Metric.tight)
+                .padding(.bottom, Metric.pageBottom)
                 .mathReadableWidth()
             }
             .screenBackground()
@@ -145,8 +145,8 @@ struct DomainListView: View {
                 }
             }
             .padding(.horizontal, Metric.gutter)
-            .padding(.top, 8)
-            .padding(.bottom, 32)
+            .padding(.top, Metric.tight)
+            .padding(.bottom, Metric.pageBottom)
         }
         .screenBackground()
         .navigationTitle("\(stage.rawValue)数学")
@@ -185,8 +185,8 @@ struct FavoriteListView: View {
                 }
             }
             .padding(.horizontal, Metric.gutter)
-            .padding(.top, 8)
-            .padding(.bottom, 32)
+            .padding(.top, Metric.tight)
+            .padding(.bottom, Metric.pageBottom)
         }
         .screenBackground()
         .navigationTitle("我的收藏")
@@ -243,11 +243,11 @@ struct ErrorBookView: View {
                                 Button { practiceLesson = group.lesson } label: {
                                     HStack(spacing: 13) {
                                         Image(systemName: "arrow.uturn.backward")
-                                            .font(.system(size: 14, weight: .semibold))
+                                            .font(AppFont.subhead)
                                             .foregroundStyle(Palette.warning)
                                             .frame(width: Metric.iconBox, height: Metric.iconBox)
                                             .background(Palette.warning.opacity(0.12))
-                                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                            .clipShape(RoundedRectangle(cornerRadius: Metric.radiusField, style: .continuous))
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text(group.lesson.title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
                                             Text("\(group.lesson.ability) · 共 \(group.lesson.questions.count) 道练习")
@@ -266,10 +266,10 @@ struct ErrorBookView: View {
                                                 .foregroundStyle(Palette.textTertiary)
                                         }
                                         Image(systemName: "chevron.right")
-                                            .font(.system(size: 12, weight: .semibold))
+                                            .font(AppFont.captionStrong)
                                             .foregroundStyle(Palette.textTertiary)
                                     }
-                                    .padding(14)
+                                    .padding(Metric.fieldPadding)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .background(Palette.surface)
                                     .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
@@ -282,8 +282,8 @@ struct ErrorBookView: View {
                 }
             }
             .padding(.horizontal, Metric.gutter)
-            .padding(.top, 8)
-            .padding(.bottom, 32)
+            .padding(.top, Metric.tight)
+            .padding(.bottom, Metric.pageBottom)
         }
         .screenBackground()
         .navigationTitle("错题变身器")

@@ -5,7 +5,8 @@ struct MathPaywallView: View {
     @ObservedObject private var purchase = MathPurchaseManager.shared
     @Environment(\.dismiss) private var dismiss
 
-    private var priceLabel: String { purchase.product?.displayPrice ?? "¥22" }
+    /// 价格以 ASC 为准；拉取失败时显示占位，避免长期展示与后台不一致的兜底价。
+    private var priceLabel: String { purchase.product?.displayPrice ?? "—" }
 
     var body: some View {
         NavigationStack {
@@ -17,8 +18,8 @@ struct MathPaywallView: View {
                     purchaseArea
                 }
                 .padding(.horizontal, Metric.gutter)
-                .padding(.top, 10)
-                .padding(.bottom, 32)
+                .padding(.top, Metric.chipGap)
+                .padding(.bottom, Metric.pageBottom)
                 .mathReadableWidth()
             }
             .screenBackground()
@@ -44,7 +45,7 @@ struct MathPaywallView: View {
                 .foregroundStyle(.white)
                 .frame(width: 56, height: 56)
                 .background(Palette.accent)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
             Text("解锁数学登顶完整版")
                 .font(AppFont.screenTitle)
                 .foregroundStyle(Palette.textPrimary)
@@ -108,6 +109,17 @@ struct MathPaywallView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
+            if purchase.productLoadFailed {
+                HStack(spacing: 8) {
+                    Text("价格暂时无法加载，请检查网络")
+                        .font(AppFont.caption)
+                        .foregroundStyle(Palette.warning)
+                    Button("重试") { Task { await purchase.retryLoadProduct() } }
+                        .font(AppFont.caption)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
             VStack(alignment: .leading, spacing: 8) {
                 Text("购买即视为同意《用户协议》与《隐私政策》。付款通过 Apple 账户完成，换机后可用「恢复购买」找回。")
                     .font(.system(size: 11))
@@ -122,11 +134,11 @@ struct MathPaywallView: View {
     private func benefitRow(_ title: String, subtitle: String, tint: Color, icon: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .semibold))
+                .font(AppFont.subhead)
                 .foregroundStyle(tint)
                 .frame(width: Metric.iconBox, height: Metric.iconBox)
                 .background(tint.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: Metric.radiusField, style: .continuous))
             VStack(alignment: .leading, spacing: 3) {
                 Text(title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
                 Text(subtitle)

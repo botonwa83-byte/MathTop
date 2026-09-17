@@ -33,6 +33,32 @@ final class MathTopTests: XCTestCase {
         XCTAssertFalse(MathContent.simulationBatch(1).isEmpty, "第 1 批仿真题必须免费可用")
     }
 
+    /// 免费的第 1 批必须是整批题量：仿真入口若被「每知识点前 N 题」截断，
+    /// 就会出现宣传 34 题、实际只给 3 题的虚假宣传（Guideline 2.3）。
+    func testFreeSimulationBatchIsNotTruncatedByLessonFreeTier() {
+        let batch = MathContent.simulationBatch(1)
+        XCTAssertGreaterThan(
+            batch.count,
+            MathPurchaseManager.freeQuestionsPerLesson,
+            "第 1 批仿真题必须给出整批题量，不能被每个知识点的免费档截断"
+        )
+    }
+
+    /// 错题本必须能消化：同一道题重做答对后自动移出，否则复习队列永远清不空。
+    func testMistakeClearsAfterCorrectRetry() {
+        let defaults = UserDefaults(suiteName: "MathTopTests-\(UUID().uuidString)")!
+        let store = LearningStore(defaults: defaults, now: { Date() }, calendar: .current)
+
+        store.recordAttempt(questionID: "q1", lessonID: "l1", correct: false)
+        XCTAssertEqual(store.incorrectAttempts.count, 1, "答错应进入错题本")
+
+        store.recordAttempt(questionID: "q1", lessonID: "l1", correct: true)
+        XCTAssertEqual(store.incorrectAttempts.count, 0, "重做答对后应移出错题本")
+
+        store.recordAttempt(questionID: "q2", lessonID: "l1", correct: false)
+        XCTAssertEqual(store.incorrectAttempts.count, 1, "新增错题应重新计入")
+    }
+
     func testProductIDMatchesBundlePrefix() {
         let manager = MathPurchaseManager.shared
         XCTAssertTrue(

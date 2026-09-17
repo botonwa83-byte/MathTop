@@ -37,7 +37,7 @@ struct StatTile: View {
         VStack(alignment: .leading, spacing: 6) {
             if let icon {
                 Image(systemName: icon)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(AppFont.footnote)
                     .foregroundStyle(tint)
             }
             Text(value)
@@ -52,7 +52,7 @@ struct StatTile: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 14)
-        .padding(.horizontal, 14)
+        .padding(.horizontal, Metric.fieldPadding)
         .background(Palette.surface)
         .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
         .overlay(
@@ -71,7 +71,7 @@ struct TagBadge: View {
     var body: some View {
         HStack(spacing: 4) {
             if let icon {
-                Image(systemName: icon).font(.system(size: 10, weight: .bold))
+                Image(systemName: icon).font(AppFont.badge)
             }
             Text(text).font(AppFont.label)
         }
@@ -127,18 +127,18 @@ struct CapabilityBar: View {
         VStack(alignment: .leading, spacing: 7) {
             HStack(spacing: 8) {
                 Image(systemName: capability.systemImage)
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(AppFont.captionStrong)
                     .foregroundStyle(capability.tint)
                     .frame(width: 24, height: 24)
                     .background(capability.tint.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: Metric.radiusDot, style: .continuous))
                 Text(capability.title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
                 Spacer(minLength: 6)
                 Text("\(Int(mastery * 100))%")
                     .font(AppFont.caption.bold())
                     .foregroundStyle(Palette.textSecondary)
                 Image(systemName: trend.systemImage)
-                    .font(.system(size: 10, weight: .bold))
+                    .font(AppFont.badge)
                     .foregroundStyle(trend.tint)
             }
             ProgressView(value: max(0.001, min(mastery, 1)))
@@ -163,7 +163,7 @@ struct MiniBarChart: View {
         HStack(alignment: .bottom, spacing: 6) {
             ForEach(Array(values.enumerated()), id: \.offset) { _, value in
                 VStack(spacing: 4) {
-                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    RoundedRectangle(cornerRadius: Metric.radiusHairline, style: .continuous)
                         .fill(value == 0 ? Palette.fill : tint.opacity(0.35 + 0.65 * Double(value) / Double(maxValue)))
                         .frame(height: max(6, 34 * CGFloat(value) / CGFloat(maxValue)))
                     Text("\(value)")
@@ -189,8 +189,8 @@ struct PrimaryButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
-                Text(title).font(.system(size: 16, weight: .semibold))
-                if let icon { Image(systemName: icon).font(.system(size: 14, weight: .bold)) }
+                Text(title).font(AppFont.cardTitle)
+                if let icon { Image(systemName: icon).font(AppFont.subheadBold) }
             }
             .frame(maxWidth: .infinity)
             .frame(height: Metric.tapTarget + 4)
@@ -212,8 +212,8 @@ struct SecondaryButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
-                if let icon { Image(systemName: icon).font(.system(size: 13, weight: .semibold)) }
-                Text(title).font(.system(size: 15, weight: .semibold))
+                if let icon { Image(systemName: icon).font(AppFont.footnote) }
+                Text(title).font(AppFont.bodyStrong)
             }
             .frame(maxWidth: .infinity)
             .frame(height: Metric.tapTarget)
@@ -236,9 +236,9 @@ struct ChipButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 14, weight: .semibold))
+                .font(AppFont.subhead)
                 .foregroundStyle(selected ? .white : Palette.textSecondary)
-                .padding(.horizontal, 14)
+                .padding(.horizontal, Metric.fieldPadding)
                 .frame(height: 36)
                 .background(selected ? tint : Palette.surface)
                 .clipShape(Capsule())
@@ -257,8 +257,8 @@ struct StageSegmentedControl: View {
             ForEach(Stage.allCases, id: \.self) { item in
                 Button { stage = item } label: {
                     HStack(spacing: 5) {
-                        Image(systemName: item.systemImage).font(.system(size: 12, weight: .semibold))
-                        Text(item.rawValue).font(.system(size: 14, weight: .semibold))
+                        Image(systemName: item.systemImage).font(AppFont.captionStrong)
+                        Text(item.rawValue).font(AppFont.subhead)
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 38)
@@ -269,7 +269,7 @@ struct StageSegmentedControl: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(3)
+        .padding(Metric.hairline)
         .background(Palette.fill)
         .clipShape(Capsule())
     }
@@ -288,11 +288,11 @@ struct ActionRow: View {
     var body: some View {
         HStack(spacing: 13) {
             Image(systemName: icon)
-                .font(.system(size: 15, weight: .semibold))
+                .font(AppFont.bodyStrong)
                 .foregroundStyle(tint)
                 .frame(width: Metric.iconBox, height: Metric.iconBox)
                 .background(tint.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: Metric.radiusField, style: .continuous))
             VStack(alignment: .leading, spacing: 3) {
                 Text(title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
                 if let subtitle {
@@ -308,11 +308,11 @@ struct ActionRow: View {
                 Text(trailingText).font(AppFont.caption.bold()).foregroundStyle(Palette.textSecondary)
             }
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
+                .font(AppFont.captionStrong)
                 .foregroundStyle(Palette.textTertiary)
         }
         .padding(.vertical, 12)
-        .padding(.horizontal, 14)
+        .padding(.horizontal, Metric.fieldPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Palette.surface)
         .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
@@ -365,7 +365,7 @@ struct NoticeBanner: View {
     var body: some View {
         HStack(alignment: .top, spacing: 11) {
             Image(systemName: icon)
-                .font(.system(size: 15, weight: .semibold))
+                .font(AppFont.bodyStrong)
                 .foregroundStyle(tint)
             VStack(alignment: .leading, spacing: 3) {
                 Text(title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
@@ -375,9 +375,9 @@ struct NoticeBanner: View {
                 }
             }
             Spacer(minLength: 6)
-            Image(systemName: "chevron.right").font(.system(size: 11, weight: .semibold)).foregroundStyle(Palette.textTertiary)
+            Image(systemName: "chevron.right").font(AppFont.label).foregroundStyle(Palette.textTertiary)
         }
-        .padding(14)
+        .padding(Metric.fieldPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(tint.opacity(0.10))
         .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
@@ -405,7 +405,7 @@ struct EmptyStateView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 34)
+        .padding(.vertical, Metric.heroGap)
         .padding(.horizontal, 20)
     }
 }

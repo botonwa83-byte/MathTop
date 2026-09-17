@@ -19,8 +19,8 @@ struct PathView: View {
                     domainSections
                 }
                 .padding(.horizontal, Metric.gutter)
-                .padding(.top, 8)
-                .padding(.bottom, 32)
+                .padding(.top, Metric.tight)
+                .padding(.bottom, Metric.pageBottom)
                 .mathReadableWidth()
             }
             .screenBackground()
@@ -51,7 +51,7 @@ struct PathView: View {
                 Divider().overlay(Palette.line)
                 HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "arrow.triangle.branch")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(AppFont.footnote)
                         .foregroundStyle(Palette.accent)
                     Text(summary.nextStep)
                         .font(AppFont.caption)
@@ -97,11 +97,11 @@ struct LessonRow: View {
     var body: some View {
         HStack(spacing: 13) {
             Image(systemName: completed ? "checkmark" : (lesson.capabilities.first?.systemImage ?? "circle.dashed"))
-                .font(.system(size: 14, weight: .semibold))
+                .font(AppFont.subhead)
                 .foregroundStyle(completed ? .white : lesson.stage.tint)
                 .frame(width: Metric.iconBox, height: Metric.iconBox)
                 .background(completed ? Palette.success : lesson.stage.tint.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: Metric.radiusField, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(lesson.title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
@@ -118,9 +118,9 @@ struct LessonRow: View {
                 }
             }
             Spacer(minLength: 4)
-            Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Palette.textTertiary)
+            Image(systemName: "chevron.right").font(AppFont.captionStrong).foregroundStyle(Palette.textTertiary)
         }
-        .padding(14)
+        .padding(Metric.fieldPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Palette.surface)
         .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
@@ -177,11 +177,11 @@ struct SkillDetailView: View {
                     ForEach(lesson.capabilities) { capability in
                         HStack(alignment: .top, spacing: 8) {
                             Image(systemName: capability.systemImage)
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(AppFont.captionStrong)
                                 .foregroundStyle(capability.tint)
                                 .frame(width: 24, height: 24)
                                 .background(capability.tint.opacity(0.12))
-                                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                                .clipShape(RoundedRectangle(cornerRadius: Metric.radiusDot, style: .continuous))
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(capability.title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
                                 Text(capability.blurb).font(AppFont.caption).foregroundStyle(Palette.textSecondary)
@@ -220,7 +220,7 @@ struct SkillDetailView: View {
                 }
             }
             .padding(Metric.gutter)
-            .padding(.bottom, 24)
+            .padding(.bottom, Metric.blockGap)
         }
         .screenBackground()
         .navigationTitle("知识点详情")
@@ -279,7 +279,7 @@ struct DomainLessonListView: View {
                 }
             }
             .padding(Metric.gutter)
-            .padding(.bottom, 24)
+            .padding(.bottom, Metric.blockGap)
         }
         .screenBackground()
         .navigationTitle(group.title)

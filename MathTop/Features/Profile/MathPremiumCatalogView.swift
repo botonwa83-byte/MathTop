@@ -24,8 +24,9 @@ struct MathPremiumCatalogView: View {
                 }
             }
             .padding(.horizontal, Metric.gutter)
-            .padding(.top, 8)
-            .padding(.bottom, 32)
+            .padding(.top, Metric.tight)
+            .padding(.bottom, Metric.pageBottom)
+            .mathReadableWidth()
         }
         .screenBackground()
         .navigationTitle("进阶模块")
@@ -37,11 +38,11 @@ struct MathPremiumCatalogView: View {
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 Image(systemName: module.systemImage)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(AppFont.bodyStrong)
                     .foregroundStyle(module.tint)
                     .frame(width: Metric.iconBox, height: Metric.iconBox)
                     .background(module.tint.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: Metric.radiusField, style: .continuous))
                 VStack(alignment: .leading, spacing: 4) {
                     Text(module.title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
                     Text(module.pitch)
@@ -51,7 +52,7 @@ struct MathPremiumCatalogView: View {
                 }
                 Spacer(minLength: 4)
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(AppFont.captionStrong)
                     .foregroundStyle(Palette.textTertiary)
             }
             HStack(spacing: 6) {
@@ -59,7 +60,7 @@ struct MathPremiumCatalogView: View {
                 TagBadge(text: "\(questions) 道练习", tint: Palette.textSecondary)
             }
         }
-        .padding(14)
+        .padding(Metric.fieldPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Palette.surface)
         .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
@@ -115,8 +116,9 @@ struct MathPremiumModuleView: View {
                 }
             }
             .padding(.horizontal, Metric.gutter)
-            .padding(.top, 8)
-            .padding(.bottom, 32)
+            .padding(.top, Metric.tight)
+            .padding(.bottom, Metric.pageBottom)
+            .mathReadableWidth()
         }
         .screenBackground()
         .navigationTitle(module.title)

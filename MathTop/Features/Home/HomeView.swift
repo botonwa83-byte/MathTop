@@ -6,7 +6,10 @@ struct HomeView: View {
     @State private var stage: Stage = .primary
     @State private var showPractice = false
     @State private var runningActivity: LearningActivity?
+    @State private var showPaywall = false
     @State private var scrollTarget: String? = LaunchOptions.scrollTarget
+    // 单例注入：付费状态是全局的，首页入口需与「我的」页一致地拦截未解锁内容
+    @ObservedObject private var purchase = MathPurchaseManager.shared
 
     private var dailyPlan: DailyPlan { DailyPlanService.makePlan(stage: stage, store: store) }
     private var summary: GrowthSummary { GrowthSummaryService.make(store: store) }
@@ -35,8 +38,8 @@ struct HomeView: View {
                         weeklySection.id("weekly")
                     }
                     .padding(.horizontal, Metric.gutter)
-                    .padding(.top, 12)
-                    .padding(.bottom, 32)
+                    .padding(.top, Metric.stack)
+                    .padding(.bottom, Metric.pageBottom)
                     .mathReadableWidth()
                 }
                 .onAppear {
@@ -61,6 +64,9 @@ struct HomeView: View {
                     runningActivity = nil
                 }
                 .environmentObject(store)
+            }
+            .sheet(isPresented: $showPaywall) {
+                MathPaywallView()
             }
         }
     }
@@ -211,7 +217,7 @@ struct HomeView: View {
                 }
                 Divider().overlay(Palette.line)
                 HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: "target").font(.system(size: 13, weight: .semibold)).foregroundStyle(Palette.accent)
+                    Image(systemName: "target").font(AppFont.footnote).foregroundStyle(Palette.accent)
                     Text(summary.nextStep)
                         .font(AppFont.caption)
                         .foregroundStyle(Palette.textSecondary)
@@ -220,8 +226,8 @@ struct HomeView: View {
                 }
                 NavigationLink { GrowthSummaryView() } label: {
                     HStack(spacing: 8) {
-                        Image(systemName: "chart.bar.xaxis").font(.system(size: 13, weight: .semibold))
-                        Text("查看成长摘要").font(.system(size: 15, weight: .semibold))
+                        Image(systemName: "chart.bar.xaxis").font(AppFont.footnote)
+                        Text("查看成长摘要").font(AppFont.bodyStrong)
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: Metric.tapTarget)
@@ -281,7 +287,7 @@ struct HomeView: View {
                 .font(AppFont.label)
                 .foregroundStyle(Palette.textTertiary)
         }
-        .padding(14)
+        .padding(Metric.fieldPadding)
         .frame(width: 176, alignment: .leading)
         .background(Palette.surface)
         .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
@@ -297,11 +303,11 @@ struct HomeView: View {
                 NavigationLink { SkillDetailView(lesson: lesson) } label: {
                     HStack(spacing: 14) {
                         Image(systemName: lesson.capabilities.first?.systemImage ?? "function")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(AppFont.cardTitle)
                             .foregroundStyle(lesson.stage.tint)
                             .frame(width: Metric.iconBox, height: Metric.iconBox)
                             .background(lesson.stage.tint.opacity(0.12))
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: Metric.radiusField, style: .continuous))
                         VStack(alignment: .leading, spacing: 4) {
                             Text(lesson.title).font(AppFont.cardTitle).foregroundStyle(Palette.textPrimary)
                             Text(lesson.summary)
@@ -315,9 +321,9 @@ struct HomeView: View {
                             }
                         }
                         Spacer(minLength: 6)
-                        Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Palette.textTertiary)
+                        Image(systemName: "chevron.right").font(AppFont.captionStrong).foregroundStyle(Palette.textTertiary)
                     }
-                    .padding(14)
+                    .padding(Metric.fieldPadding)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Palette.surface)
                     .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))
@@ -328,7 +334,7 @@ struct HomeView: View {
                 Text("这个学段的知识点都练过了，去能力地图换一个学段吧。")
                     .font(AppFont.caption)
                     .foregroundStyle(Palette.textSecondary)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, Metric.tight)
             }
         }
     }
@@ -372,16 +378,29 @@ struct HomeView: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink { MathPremiumCatalogView() } label: {
-                    ActionRow(
-                        icon: "sparkles",
-                        title: "进阶模块",
-                        subtitle: "竞赛压轴、几何实验室、应用题冲刺与阶段测评",
-                        tint: Color(hex: 0x8A6BE2),
-                        trailingText: "\(MathPremiumModule.all.count) 个"
-                    )
+                if purchase.isUnlocked {
+                    NavigationLink { MathPremiumCatalogView() } label: {
+                        ActionRow(
+                            icon: "sparkles",
+                            title: "进阶模块",
+                            subtitle: "竞赛压轴、几何实验室、应用题冲刺与阶段测评",
+                            tint: Color(hex: 0x8A6BE2),
+                            trailingText: "\(MathPremiumModule.all.count) 个"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    Button { showPaywall = true } label: {
+                        ActionRow(
+                            icon: "lock.fill",
+                            title: "进阶模块",
+                            subtitle: "竞赛压轴、几何实验室、应用题冲刺与阶段测评（完整版解锁后开放）",
+                            tint: Color(hex: 0x8A6BE2),
+                            trailingText: "完整版"
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
     }

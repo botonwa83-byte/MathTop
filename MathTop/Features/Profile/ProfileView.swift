@@ -19,8 +19,8 @@ struct ProfileView: View {
                     aboutSection
                 }
                 .padding(.horizontal, Metric.gutter)
-                .padding(.top, 8)
-                .padding(.bottom, 32)
+                .padding(.top, Metric.tight)
+                .padding(.bottom, Metric.pageBottom)
                 .mathReadableWidth()
             }
             .screenBackground()
@@ -33,11 +33,11 @@ struct ProfileView: View {
         Button { showPaywall = true } label: {
             HStack(spacing: 12) {
                 Image(systemName: "crown.fill")
-                    .font(.system(size: 18, weight: .bold))
+                    .font(AppFont.sectionTitle)
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
                     .background(Color.white.opacity(0.20))
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: Metric.radiusField, style: .continuous))
                 VStack(alignment: .leading, spacing: 3) {
                     Text("解锁完整版").font(AppFont.cardTitle).foregroundStyle(.white)
                     Text("完整题组 · 进阶模块 · 仿真全三批 · 一次买断")
@@ -49,7 +49,7 @@ struct ProfileView: View {
                     .font(AppFont.cardTitle)
                     .foregroundStyle(.white)
             }
-            .padding(14)
+            .padding(Metric.fieldPadding)
             .background(
                 LinearGradient(colors: [Palette.accent, Color(hex: 0xE0912F)], startPoint: .leading, endPoint: .trailing)
             )
@@ -272,7 +272,7 @@ struct GrowthSummaryView: View {
                 }
             }
             .padding(Metric.gutter)
-            .padding(.bottom, 24)
+            .padding(.bottom, Metric.blockGap)
             .mathReadableWidth()
         }
         .screenBackground()
@@ -282,7 +282,7 @@ struct GrowthSummaryView: View {
     private func highlightRow(icon: String, title: String, message: String, tint: Color) -> some View {
         HStack(alignment: .top, spacing: 11) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .bold))
+                .font(AppFont.subheadBold)
                 .foregroundStyle(tint)
                 .frame(width: 30, height: 30)
                 .background(tint.opacity(0.12))
@@ -296,7 +296,7 @@ struct GrowthSummaryView: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(14)
+        .padding(Metric.fieldPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Palette.surface)
         .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))

@@ -26,8 +26,11 @@ import SwiftUI
     @Published private(set) var product: Product?
     @Published private(set) var isPurchasing: Bool = false
     @Published private(set) var errorMessage: String?
+    /// 商品信息拉取失败（无网络 / ASC 未配置）：付费墙需提示重试，而不是长期展示兜底价。
+    @Published private(set) var productLoadFailed: Bool = false
 
     private let storageKey = "mathtop.full_unlocked"
+    private var updatesTask: Task<Void, Never>?
 
     private init() {
         isUnlocked = UserDefaults.standard.bool(forKey: storageKey)
@@ -35,6 +38,7 @@ import SwiftUI
             await loadProduct()
             await refreshEntitlements()
         }
+        listenForTransactions()
     }
 
     // MARK: 免费档判定
@@ -63,14 +67,22 @@ import SwiftUI
         do {
             let products = try await Product.products(for: [productID])
             product = products.first
+            productLoadFailed = product == nil
         } catch {
-            // 未配置商品时静默失败，价格降级显示为 ¥22
+            productLoadFailed = true
         }
+    }
+
+    /// 付费墙「重试」入口：网络恢复或 ASC 配置就绪后重新拉取价格。
+    func retryLoadProduct() async {
+        productLoadFailed = false
+        await loadProduct()
     }
 
     func purchase() async {
         guard let product else {
-            errorMessage = "获取产品信息失败，请检查网络后重试"
+            errorMessage = "商品信息尚未加载完成，请检查网络后重试"
+            await loadProduct()
             return
         }
         isPurchasing = true
@@ -108,20 +120,54 @@ import SwiftUI
         }
     }
 
+    /// 以 App Store 记录为准：没有有效交易时回退解锁状态，退款/撤销能真实生效。
     func refreshEntitlements() async {
-        for await result in Transaction.currentEntitlements {
+        var entitled = false
+        for await result in StoreKit.Transaction.currentEntitlements {
             if case .verified(let tx) = result,
                tx.productID == productID,
                tx.revocationDate == nil {
-                unlock()
-                return
+                entitled = true
+                break
             }
+        }
+        if entitled {
+            unlock()
+        } else {
+            lock()
         }
     }
 
     private func unlock() {
         isUnlocked = true
         UserDefaults.standard.set(true, forKey: storageKey)
+    }
+
+    /// 退款或家庭共享撤销：解锁状态回退，避免本地标记永久生效。
+    private func lock() {
+        isUnlocked = false
+        UserDefaults.standard.set(false, forKey: storageKey)
+    }
+
+    /// 监听 App 之外完成的交易：家长批准（Ask to Buy）、换机重装、退款撤销都会走到这里。
+    private func listenForTransactions() {
+        updatesTask?.cancel()
+        updatesTask = Task.detached { [weak self] in
+            for await result in StoreKit.Transaction.updates {
+                guard let self else { return }
+                guard case .verified(let tx) = result, tx.productID == self.productID else { continue }
+                await self.apply(transaction: tx)
+            }
+        }
+    }
+
+    private func apply(transaction tx: StoreKit.Transaction) async {
+        if tx.revocationDate != nil {
+            lock()
+            return
+        }
+        await tx.finish()
+        unlock()
     }
 
     private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {

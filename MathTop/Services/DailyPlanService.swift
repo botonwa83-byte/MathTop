@@ -47,7 +47,10 @@ enum DailyPlanService {
 
     private static func dueAttempts(in store: LearningStore, lessons: [Lesson], now: Date, calendar: Calendar) -> [Attempt] {
         let lessonIDs = Set(lessons.map(\.id))
-        return store.attempts.filter { lessonIDs.contains($0.lessonID) && ReviewScheduler.isDue($0, now: now, calendar: calendar) }
+        // 只安排尚未消化的错题，且按到期时间升序，保证「最该复习的先来」
+        return store.incorrectAttempts
+            .filter { lessonIDs.contains($0.lessonID) && ReviewScheduler.isDue($0, now: now, calendar: calendar) }
+            .sorted { $0.date < $1.date }
     }
 
     private static func lessonForDueAttempt(_ attempt: Attempt?, lessons: [Lesson]) -> Lesson? {

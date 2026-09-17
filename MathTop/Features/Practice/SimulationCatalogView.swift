@@ -99,14 +99,14 @@ struct SimulationCatalogView: View {
                 }
             }
             .padding(.horizontal, Metric.gutter)
-            .padding(.top, 8)
-            .padding(.bottom, 32)
+            .padding(.top, Metric.tight)
+            .padding(.bottom, Metric.pageBottom)
             .mathReadableWidth()
         }
         .screenBackground()
         .navigationTitle("仿真题训练")
         .sheet(item: $activeBatch) { batch in
-            PracticeView(lesson: batch.lesson, chunkSize: nil) {
+            PracticeView(lesson: batch.lesson, chunkSize: nil, fullAccess: true) {
                 markCompleted(batch.number)
             }
             .environmentObject(store)
@@ -124,7 +124,7 @@ struct SimulationCatalogView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 12) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        RoundedRectangle(cornerRadius: Metric.radiusField, style: .continuous)
                             .fill(done ? Palette.success : batch.stage.tint.opacity(0.14))
                         Text("\(batch.number)")
                             .font(.system(size: 17, weight: .bold, design: .rounded))
@@ -145,7 +145,7 @@ struct SimulationCatalogView: View {
                     }
                     Spacer(minLength: 4)
                     Image(systemName: locked ? "lock.fill" : "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(AppFont.captionStrong)
                         .foregroundStyle(Palette.textTertiary)
                 }
                 Text(batch.focus)
@@ -153,7 +153,7 @@ struct SimulationCatalogView: View {
                     .foregroundStyle(Palette.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(14)
+            .padding(Metric.fieldPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Palette.surface)
             .clipShape(RoundedRectangle(cornerRadius: Metric.radiusTile, style: .continuous))

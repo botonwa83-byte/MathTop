@@ -9,8 +9,24 @@ final class LearningStore: ObservableObject {
     @Published private(set) var streak: Int = 0
     @Published private(set) var lastStudyDate: Date?
 
-    var incorrectAttempts: [Attempt] { attempts.filter { !$0.correct } }
-    var dueReviewCount: Int { attempts.filter { ReviewScheduler.isDue($0, now: now(), calendar: calendar) }.count }
+    /// 错题本：同一道题以最近一次作答为准，重做答对后自动消化，
+    /// 避免错题只增不减、复习队列永远清不空。
+    var incorrectAttempts: [Attempt] { latestAttempts.filter { !$0.correct } }
+
+    /// 每道题保留最近一次作答（按时间倒序，最新在前）。
+    var latestAttempts: [Attempt] {
+        var latest: [String: Attempt] = [:]
+        for attempt in attempts {
+            if let existing = latest[attempt.questionID], existing.date > attempt.date { continue }
+            latest[attempt.questionID] = attempt
+        }
+        return latest.values.sorted { $0.date > $1.date }
+    }
+
+    /// 到期复习只统计尚待消化的错题，与首页「N 道错题该复习了」文案一致。
+    var dueReviewCount: Int {
+        incorrectAttempts.filter { ReviewScheduler.isDue($0, now: now(), calendar: calendar) }.count
+    }
     var completedSessionsCount: Int { studySessions.filter(\.isCompleted).count }
     var reflectionCount: Int { activityEvents.filter { $0.mode == .reflect }.count }
 

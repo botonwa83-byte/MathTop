@@ -137,8 +137,29 @@ enum Metric {
 
     static let radiusCard: CGFloat = 20
     static let radiusTile: CGFloat = 16
+    /// 面板 / 分组容器
+    static let radiusPanel: CGFloat = 14
+    /// 输入框、小按钮等控件
+    static let radiusField: CGFloat = 12
     static let radiusChip: CGFloat = 10
+    /// 圆点指示器等极小元素
+    static let radiusDot: CGFloat = 7
+    /// 分隔条等最细圆角
+    static let radiusHairline: CGFloat = 4
     static let radiusPill: CGFloat = 999
+
+    /// 页面底部安全留白
+    static let pageBottom: CGFloat = 32
+    /// 区块之间的大间距
+    static let blockGap: CGFloat = 24
+    /// 输入框 / 小控件内边距
+    static let fieldPadding: CGFloat = 14
+    /// 英雄区上下留白
+    static let heroGap: CGFloat = 34
+    /// 标签类元素的小间距
+    static let chipGap: CGFloat = 10
+    /// 极细间距
+    static let hairline: CGFloat = 3
 
     static let iconBox: CGFloat = 42
     static let tapTarget: CGFloat = 44
@@ -165,6 +186,18 @@ enum AppFont {
     static let metric = Font.system(size: 22, weight: .bold, design: .rounded)
     /// 题面 / 选项。
     static let question = Font.system(size: 20, weight: .semibold, design: .rounded)
+    /// 13 号强调（说明文字的加粗版）。
+    static let footnote = Font.system(size: 13, weight: .semibold)
+    /// 12 号强调（标签、状态文字）。
+    static let captionStrong = Font.system(size: 12, weight: .semibold)
+    /// 15 号强调（正文中的重点）。
+    static let bodyStrong = Font.system(size: 15, weight: .semibold)
+    /// 14 号小标题。
+    static let subhead = Font.system(size: 14, weight: .semibold)
+    /// 14 号加粗小标题。
+    static let subheadBold = Font.system(size: 14, weight: .bold)
+    /// 角标数字。
+    static let badge = Font.system(size: 10, weight: .bold)
 }
 
 // MARK: - 工具

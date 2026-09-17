@@ -57,7 +57,7 @@
 		33B32ABC1C14C5149760E24D /* MathPremiumCatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathPremiumCatalogView.swift; sourceTree = "<group>"; };
 		3A49CC447B4B6E7A5B714CE7 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		40C5703EB168E6289B838CED /* PracticeBankSupplement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeBankSupplement.swift; sourceTree = "<group>"; };
-		495FB9B6E3CE803FD846DB3D /* MathTop.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MathTop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		495FB9B6E3CE803FD846DB3D /* MathTop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MathTop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5229E95F844A2FB71A63EF4C /* LearningStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningStore.swift; sourceTree = "<group>"; };
 		523F2523CB209C8B6E09B844 /* ReviewScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewScheduler.swift; sourceTree = "<group>"; };
 		573CC767D8E7A9F84BDAD976 /* LaunchOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchOptions.swift; sourceTree = "<group>"; };
@@ -80,7 +80,7 @@
 		DC5E9840EFD0013168CD70FE /* NotebookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookView.swift; sourceTree = "<group>"; };
 		EFCB863DC6E21BFC3392F946 /* MathTopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathTopTests.swift; sourceTree = "<group>"; };
 		F26E4163A3F0A9825D7187AF /* MathContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathContent.swift; sourceTree = "<group>"; };
-		F4E6881DAD39544A2B116784 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		F4E6881DAD39544A2B116784 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		F61497F72EA5328936855FAD /* LessonPractice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonPractice.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -298,8 +298,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = F9F13E48BE0609CB07371659 /* Build configuration list for PBXProject "MathTop" */;
 			developmentRegion = en;
@@ -555,6 +553,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = Z7F8BY55DS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MathTop;
@@ -579,6 +578,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = Z7F8BY55DS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MathTop;
