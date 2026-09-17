@@ -21,7 +21,7 @@ struct MathPromoView: View {
                     ForEach([("map", "知识地图：数与式、函数、几何、统计全覆盖"), ("target", "能力靶场：每题都有方法、步骤与解析"), ("arrow.triangle.2.circlepath", "错题复盘：按错误类型安排间隔复习"), ("chart.xyaxis.line", "提分报告：阶段测评与薄弱点建议")], id: \.1) { item in
                         Label(item.1, systemImage: item.0).frame(maxWidth: .infinity, alignment: .leading).padding(15).background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: Metric.radiusPanel)).foregroundStyle(.white)
                     }
-                    HStack { stat("\(MathContent.lessons.count)", "知识点"); Divider().frame(height: 28); stat("\(MathContent.lessons.reduce(0) { $0 + $1.questions.count })", "练习题"); Divider().frame(height: 28); stat("5", "进阶模块") }.padding().background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: Metric.radiusPanel))
+                    HStack { stat("\(MathContent.lessons.count)", "知识点"); Divider().frame(height: 28); stat("\(MathContent.totalQuestionCount)", "练习题"); Divider().frame(height: 28); stat("5", "进阶模块") }.padding().background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: Metric.radiusPanel))
                     Text("学习能力闭环：看懂情境 → 建立模型 → 推导验证 → 迁移复盘").font(.caption).foregroundStyle(mint).multilineTextAlignment(.center).padding(.vertical, Metric.tight)
                     MathFamilyAdSection(current: .math, onDark: true)
                     MathUnlockAskCard(price: priceLabel, onDark: true, onUnlock: { showPaywall = true }, onBrowse: { onEnter() })

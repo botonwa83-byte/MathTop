@@ -12,7 +12,7 @@ struct HomeView: View {
     @ObservedObject private var purchase = MathPurchaseManager.shared
 
     private var dailyPlan: DailyPlan { DailyPlanService.makePlan(stage: stage, store: store) }
-    private var summary: GrowthSummary { GrowthSummaryService.make(store: store) }
+    private var summary: GrowthSummary { store.growthSummary }
     private var domains: [DomainGroup] { DomainCatalog.groups(for: stage) }
 
     private var stageLessons: [Lesson] { MathContent.lessons(for: stage) }
@@ -22,7 +22,8 @@ struct HomeView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        PerfProbe.tick("HomeView")
+        return NavigationStack {
             ScrollViewReader { proxy in
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: Metric.sectionGap) {
@@ -43,6 +44,11 @@ struct HomeView: View {
                     .mathReadableWidth()
                 }
                 .onAppear {
+                    if ProcessInfo.processInfo.arguments.contains("-perfSeed") {
+                        for i in 0..<20000 { store.recordAttempt(questionID: "q\(i % 800)", lessonID: "p-four", correct: i % 3 != 0, notify: false) }
+                        store.flushNowSync()
+                    }
+                    if ProcessInfo.processInfo.arguments.contains("-perfPractice") { showPractice = true }
                     guard let target = scrollTarget else { return }
                     scrollTarget = nil
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {

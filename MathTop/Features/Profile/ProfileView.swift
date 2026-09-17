@@ -6,10 +6,11 @@ struct ProfileView: View {
     @ObservedObject private var purchase = MathPurchaseManager.shared
     @State private var showPaywall = false
 
-    private var summary: GrowthSummary { GrowthSummaryService.make(store: store) }
+    private var summary: GrowthSummary { store.growthSummary }
 
     var body: some View {
-        NavigationStack {
+        PerfProbe.tick("ProfileView")
+        return NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: Metric.sectionGap) {
                     profileCard
@@ -172,7 +173,7 @@ struct ProfileView: View {
             SectionHeader(title: "关于")
             VStack(alignment: .leading, spacing: 10) {
                 aboutRow("知识点总数", "\(MathContent.lessons.count) 个")
-                aboutRow("配套练习总数", "\(MathContent.lessons.reduce(0) { $0 + $1.questions.count }) 道")
+                aboutRow("配套练习总数", "\(MathContent.totalQuestionCount) 道")
                 aboutRow("每个知识点配套题量", "不少于 \(LessonPracticeFactory.questionsPerPoint) 道")
                 aboutRow("学习活动库", "\(MathContent.learningActivities.count) 个情境任务")
                 Divider().overlay(Palette.line)
@@ -199,7 +200,7 @@ struct ProfileView: View {
 struct GrowthSummaryView: View {
     @EnvironmentObject private var store: LearningStore
 
-    private var summary: GrowthSummary { GrowthSummaryService.make(store: store) }
+    private var summary: GrowthSummary { store.growthSummary }
 
     var body: some View {
         ScrollView(showsIndicators: false) {

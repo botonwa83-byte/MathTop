@@ -1,5 +1,71 @@
 import SwiftUI
 
+// MARK: 临时性能探针（测量后删除）
+final class FrameProbe {
+    static let shared = FrameProbe()
+    private var link: CADisplayLink?
+    private var lastFrame: CFAbsoluteTime = 0
+    private var sum: Double = 0
+    private var peak: Double = 0
+    private var count = 0
+
+    func start() {
+        guard link == nil else { return }
+        link = CADisplayLink(target: self, selector: #selector(fire))
+        link?.add(to: .main, forMode: .common)
+    }
+
+    @objc private func fire() {
+        let now = CFAbsoluteTimeGetCurrent()
+        if PerfProbe.lastTapFrame > 0 {
+            PerfProbe.log(String(format: "tap -> frame %.1f ms", (now - PerfProbe.lastTapFrame) * 1000))
+            PerfProbe.lastTapFrame = 0
+        }
+        if lastFrame > 0 {
+            let delta = (now - lastFrame) * 1000
+            sum += delta
+            if delta > peak { peak = delta }
+            count += 1
+            if count >= 60 {
+                PerfProbe.log(String(format: "frames avg %.1f ms, peak %.1f ms", sum / Double(count), peak))
+                sum = 0; peak = 0; count = 0
+            }
+        }
+        lastFrame = now
+    }
+}
+
+enum PerfProbe {
+    static var lastTap: CFAbsoluteTime = 0
+    static var lastTapFrame: CFAbsoluteTime = 0
+    static var marks: [String: CFAbsoluteTime] = [:]
+
+    static func mark() {
+        lastTap = CFAbsoluteTimeGetCurrent()
+        lastTapFrame = lastTap
+    }
+
+    /// 记录某个视图两次 body 求值之间的间隔，用来判断它是否被连带重算。
+    static func tick(_ name: String) {
+        let now = CFAbsoluteTimeGetCurrent()
+        if let last = marks[name] {
+            log("\(name) body +\(String(format: "%.1f", (now - last) * 1000)) ms")
+        }
+        marks[name] = now
+    }
+    static func log(_ line: String) {
+        guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("perf.log") else { return }
+        let text = line + "\n"
+        if let handle = try? FileHandle(forWritingTo: url) {
+            handle.seekToEndOfFile()
+            handle.write(Data(text.utf8))
+            try? handle.close()
+        } else {
+            try? text.write(to: url, atomically: true, encoding: .utf8)
+        }
+    }
+}
+
 /// 练习页。
 ///
 /// 三种用法：
@@ -50,7 +116,11 @@ struct PracticeView: View {
     private var accuracy: Double { answeredCount == 0 ? 1 : Double(correctCount) / Double(answeredCount) }
 
     var body: some View {
-        NavigationStack {
+        if PerfProbe.lastTap > 0 {
+            PerfProbe.log(String(format: "render latency %.1f ms (chunk %d step %d submitted %d, attempts %d)", (CFAbsoluteTimeGetCurrent() - PerfProbe.lastTap) * 1000, chunkIndex, step, submitted ? 1 : 0, store.attempts.count))
+            PerfProbe.lastTap = 0
+        }
+        return NavigationStack {
             VStack(spacing: 0) {
                 header
                 progressBar
@@ -71,6 +141,7 @@ struct PracticeView: View {
             }
             .screenBackground()
             .navigationBarTitleDisplayMode(.inline)
+            .onDisappear { store.notifyDataChanged() }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("关闭") { dismiss() }.foregroundStyle(Palette.textSecondary)
@@ -80,6 +151,12 @@ struct PracticeView: View {
                 }
             }
             .sheet(isPresented: $showPaywall) { MathPaywallView() }
+            .onAppear { FrameProbe.shared.start() }
+            .onReceive(Timer.publish(every: 0.6, on: .main, in: .common).autoconnect()) { _ in
+                guard ProcessInfo.processInfo.arguments.contains("-perfPractice") else { return }
+                if !submitted { selectedChoiceID = questions.first?.choices.first?.id }
+                advance()
+            }
         }
     }
 
@@ -272,6 +349,7 @@ struct PracticeView: View {
     // MARK: 流程
 
     private func advance() {
+        PerfProbe.mark()
         guard let question else {
             if isLastChunk {
                 finish()
@@ -290,7 +368,10 @@ struct PracticeView: View {
 
         if !submitted {
             let correct = selectedChoiceID == question.answer
-            store.recordAttempt(questionID: question.id, lessonID: lesson.id, correct: correct)
+            // 静默写入：做题过程不触发四个 Tab 整棵重算，离开本页时统一刷新一次。
+            let t0 = CFAbsoluteTimeGetCurrent()
+            store.recordAttempt(questionID: question.id, lessonID: lesson.id, correct: correct, notify: false)
+            PerfProbe.log(String(format: "recordAttempt %.2f ms", (CFAbsoluteTimeGetCurrent() - t0) * 1000))
             answeredCount += 1
             if correct { correctCount += 1 }
             withAnimation(.easeInOut(duration: 0.18)) { submitted = true }

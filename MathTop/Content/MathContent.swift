@@ -233,5 +233,8 @@ enum MathContent {
         // 题组由 LessonPracticeFactory 统一装配（策展题 + 派生题），这里不再塞通用模板题。
         Lesson(id: id, title: title, ability: ability, subject: .math, stage: stage, minutes: 8, summary: summary, questions: [])
     }
+    /// 练习题总数：多个页面都要展示，构建一次即可，避免每次渲染全量累加。
+    static let totalQuestionCount: Int = lessons.reduce(0) { $0 + $1.questions.count }
+
     static func lessons(for stage: Stage) -> [Lesson] { lessons.filter { $0.stage == stage } }
 }

@@ -9,13 +9,14 @@ struct NotebookView: View {
     private var favoriteIDs: Set<String> { Set(favoritesRaw.split(separator: ",").map(String.init)) }
 
     var body: some View {
-        NavigationStack {
+        PerfProbe.tick("NotebookView")
+        return NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: Metric.sectionGap) {
                     HStack(spacing: 12) {
                         StatTile(value: "\(MathContent.lessons.count)", label: "全部知识点", icon: "book.closed", tint: Palette.info)
                         StatTile(
-                            value: "\(MathContent.lessons.reduce(0) { $0 + $1.questions.count })",
+                            value: "\(MathContent.totalQuestionCount)",
                             label: "配套练习总量",
                             icon: "list.number",
                             tint: Palette.accent

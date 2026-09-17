@@ -18,13 +18,13 @@ enum DailyPlanService {
 
     static func makePlan(stage: Stage, store: LearningStore, now: Date = Date(), calendar: Calendar = .current, lessons: [Lesson], activities: [LearningActivity]) -> DailyPlan {
         if let existing = store.session(on: now, stage: stage, calendar: calendar), let primary = primaryLesson(for: existing, lessons: lessons, stage: stage) {
-            return DailyPlan(session: existing, primary: primary, next: nextLesson(after: primary, in: lessons, store: store), stage: stage, dueReviewCount: dueAttempts(in: store, lessons: lessons, now: now, calendar: calendar).count, weakCapability: GrowthSummaryService.make(store: store, now: now, calendar: calendar).weakCapability?.capability)
+            return DailyPlan(session: existing, primary: primary, next: nextLesson(after: primary, in: lessons, store: store), stage: stage, dueReviewCount: dueAttempts(in: store, lessons: lessons, now: now, calendar: calendar).count, weakCapability: store.growthSummary.weakCapability?.capability)
         }
 
         let fallback = Lesson(id: "empty-\(stage.rawValue)", title: "准备你的第一课", ability: "基础能力", subject: .math, stage: stage, minutes: 5, summary: "题库正在准备，先从基础概念开始。", questions: [], capabilities: [.numberSense, .focusReflection])
         let candidateLessons = lessons.isEmpty ? [fallback] : lessons
         let due = dueAttempts(in: store, lessons: candidateLessons, now: now, calendar: calendar)
-        let weakCapability = GrowthSummaryService.make(store: store, now: now, calendar: calendar).weakCapability?.capability
+        let weakCapability = store.growthSummary.weakCapability?.capability
         let primary = lessonForDueAttempt(due.first, lessons: candidateLessons)
             ?? lessonForCapability(weakCapability, lessons: candidateLessons, store: store)
             ?? candidateLessons.first(where: { !store.completedLessonIDs.contains($0.id) })

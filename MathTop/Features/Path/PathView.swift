@@ -7,11 +7,12 @@ struct PathView: View {
 
     @State private var stage: Stage = .primary
 
-    private var summary: GrowthSummary { GrowthSummaryService.make(store: store) }
+    private var summary: GrowthSummary { store.growthSummary }
     private var domains: [DomainGroup] { DomainCatalog.groups(for: stage) }
 
     var body: some View {
-        NavigationStack {
+        PerfProbe.tick("PathView")
+        return NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: Metric.sectionGap) {
                     StageSegmentedControl(stage: $stage)
